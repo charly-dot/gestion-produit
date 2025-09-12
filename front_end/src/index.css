@@ -1,0 +1,10 @@
+.etat-activer {
+    background-color: #ef4444 !important; /* rouge-500 */
+    color: white;
+  }
+  
+  .etat-desactiver {
+    background-color: #9ca3af !important; /* gris-400 */
+    color: white;
+  }
+  
