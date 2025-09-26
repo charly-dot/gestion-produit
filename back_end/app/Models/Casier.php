@@ -23,4 +23,15 @@ class Casier extends Model
         'colone4',
         'colone5',
     ];
+    // public function stocks()
+    // {
+    //     return $this->hasMany(Stock::class, 'casier', 'nom')
+    //         ->select(['id', 'nomProduit', 'casier']);
+    // }
+
+    // public function transferts()
+    // {
+    //     return $this->hasMany(Historiquetransferstock::class, 'casierFinal', 'nom')
+    //         ->select(['id', 'produit', 'stock', 'casierFinal']);
+    // }
 }

@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class Historiquetransferstock extends Model
 {
     use HasFactory;
-
     protected $fillable = [
         'date',
         'idEntrepot',
@@ -22,6 +21,7 @@ class Historiquetransferstock extends Model
         'stock',
         'action',
         'utilisateur',
+        'created_at',
         'zone',
         'colone1',
         'colone2',
@@ -29,4 +29,12 @@ class Historiquetransferstock extends Model
         'colone4',
         'colone5',
     ];
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'colone5', 'id');
+    }
+    // public function casierFinalRel()
+    // {
+    //     return $this->belongsTo(Casier::class, 'casierFinal', 'id');
+    // }
 }

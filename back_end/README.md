@@ -96,10 +96,11 @@ php artisan migrate
 
 composer require fruitcake/laravel-cors
 
-php artisan serve
+php artisan migrate:fresh --seed
 
 php artisan storage:link
 
+php artisan serve
 
 
 CONFIGURATION DE PROJET LARAVEL POUR COMMUNIQUE AVEC LE REACTJS 
@@ -149,7 +150,7 @@ DB_HOST=127.0.0.1
 DB_PORT=5432
 DB_DATABASE=GestionProduit
 DB_USERNAME=postgres
-DB_PASSWORD=root
+DB_PASSWORD=(votre mot de passe)
 
 /// AXIOS 
 
@@ -161,22 +162,6 @@ const api = axios.create({
   },
 });
 
-/// CREATION DE FAUSE DONNE DANS LE BASE DE DONNE
-
-/donne des utilisateur 
-
-php artisan make:factory UserFactory --model=User  cree le factory
-php artisan make:seeder UsersTableSeeder cree le table seeder
-php artisan migrate:fresh --seed vide tout les table recommencer ajouter des donne 
-
-/ tier
-php artisan make:factory TierFactory --model=Tier
-php artisan make:seeder TiersTableSeeder
-php artisan migrate:fresh --seed
-/produit 
-php artisan make:factory ProduitFactory --model=Produit
-php artisan make:seeder ProduitsTableSeeder
-php artisan migrate:fresh --seed
 
 
 

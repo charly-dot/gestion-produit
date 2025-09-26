@@ -26,11 +26,11 @@ class UsersTableSeeder extends Seeder
             'modification' => 1,
             'creation' => 1,
             'activation' => 1,
-            'colone' => 'valeur1',
-            'colonee' => 'valeur2',
-            'colone3' => 'valeur3',
-            'colone4' => 'valeur4',
-            'colone5' => 'valeur5',
+            'colone'   => 1,
+            'colonee'  => 1,
+            'colone3'  => 1,
+            'colone4'  => 1,
+            'colone5'  => 1,
             'profil' => 'superadmin',
         ]);
     }

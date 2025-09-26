@@ -14,19 +14,20 @@ return new class extends Migration
         Schema::create('entrepots', function (Blueprint $table) {
             $table->id();
             $table->string('nom')->nullable();
-            $table->string('idCasier')->nullable();
+            $table->bigInteger('idCasier')->nullable();
             $table->string('etat')->nullable();
             $table->string('zone')->nullable();
-            $table->string('stock')->nullable();
-            $table->string('stockTotal')->nullable();
-            $table->string('idUtilisateur')->nullable();
-            $table->string('idProduit')->nullable();
+            $table->bigInteger('stock')->nullable();
+            $table->bigInteger('stockTotal')->nullable();
+            $table->bigInteger('idUtilisateur')->nullable();
+            $table->bigInteger('idProduit')->nullable();
             $table->string('action')->nullable();
             $table->string('colone1')->nullable();
             $table->string('colone2')->nullable();
-            $table->string('colone3')->nullable();
-            $table->string('colone4')->nullable();
-            $table->string('colone5')->nullable();
+            $table->bigInteger('colone3')->nullable();
+            $table->bigInteger('colone4')->nullable();
+            $table->bigInteger('colone5')->nullable();
+            $table->timestamps();
         });
     }
 

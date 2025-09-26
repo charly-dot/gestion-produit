@@ -13,12 +13,14 @@ return new class extends Migration
     {
         Schema::create('stocks', function (Blueprint $table) {
             $table->id();
-            $table->string('nomProduit');
-            $table->string('idProduit');
-            $table->string('entrepot');
-            $table->string('casier');
-            $table->string('colonne');
-            $table->string('colonnes');
+            $table->string('nom')->nullable();
+            $table->bigInteger('entrepot')->nullable();
+            $table->bigInteger('casier')->nullable();
+            $table->bigInteger('colone1')->nullable();
+            $table->bigInteger('colone2')->nullable();
+            $table->bigInteger('colone3')->nullable();
+            $table->bigInteger('colone4')->nullable();
+            $table->bigInteger('colone5')->nullable();
             $table->timestamps();
         });
     }

@@ -434,11 +434,13 @@ export function Produit() {
     },
   ];
 
-  const listeStock = async () => {
+  const listeStock1 = async () => {
     setLoading(true);
     try {
       const response = await axios.get("http://127.0.0.1:8000/api/liste_Stock");
-      // console.log(response.data);
+      console.log("jjjjjjjjjjj");
+      console.log(response.data);
+      console.log("jjjjjjjjjjj");
       setListeStock(response.data);
     } catch (err) {
       setError("Erreur lors du chargement de l'utilisateur.");
@@ -496,10 +498,9 @@ export function Produit() {
       setError("Tous les champs sont obligatoires !");
       return;
     }
-
     try {
       const response = await axios.post(
-        "http://127.0.0.1:8000/api/creationStock",
+        `http://127.0.0.1:8000/api/creationStock/${DonneSession.id}`,
         formDataS
       );
 
@@ -525,25 +526,54 @@ export function Produit() {
     }
   };
 
+  ///liste casier
+  const [listeCasier, setlisteCasier] = useState([]);
+  const listeCasi = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(
+        "http://127.0.0.1:8000/api/liste_Casier"
+      );
+      // console.log("jjjjjjjjjjj");
+      // console.log(response.data);
+      // console.log("jjjjjjjjjjj");
+      setlisteCasier(response.data);
+    } catch (err) {
+      setError("Erreur lors du chargement de l'utilisateur.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // MODIFICATION STOCK
 
   const [Donne_Stock, setDonne_Stock] = useState({});
   const [formDataSModification, setformDataSModification] = useState({
+    nomProduit: "",
+    stock_initia: "",
     stock: "",
     casier: "",
     entrepot: "",
+    stockfinal: "",
+    casierfinal: "",
+    entrepotfinal: "",
   });
 
   // Pré-remplir les champs au chargement du formulaire
   React.useEffect(() => {
     if (Donne_Stock.id) {
       setformDataSModification({
-        stock: Donne_Stock.stock_initia || "",
+        nomProduit: Donne_Stock.nomProduit || "",
+        stock_initia: Donne_Stock.stock_initia || "",
         casier: Donne_Stock.casier || "",
         entrepot: Donne_Stock.entrepot || "",
+        stockfinal: "",
+        casierfinal: "",
+        entrepotfinal: "",
       });
     }
   }, [Donne_Stock]);
+
   const handleChangeSm = (e) => {
     const { name, value } = e.target;
     setformDataSModification((prev) => ({ ...prev, [name]: value }));
@@ -553,23 +583,56 @@ export function Produit() {
     e.preventDefault();
     try {
       const response = await axios.put(
-        `http://127.0.0.1:8000/api/modifier_Stock/${Donne_Stock.idProduit}/${Donne_Stock.id}`,
-        {
-          stock: formDataSModification.stock,
-          entrepot: formDataSModification.entrepot,
-          casier: formDataSModification.casier,
-        }
+        `http://127.0.0.1:8000/api/modifier_Stock/${Donne_Stock.idProduit}/${Donne_Stock.id}/${DonneSession.id}`,
+        formDataSModification
       );
 
       listeStock();
       handleSelect("STOCK", "STOCK");
       setinsertionStock(false);
 
-      // vider le state
+      // Reset propre
       setformDataSModification({
-        stock: "",
+        nomProduit: "",
+        stock_initia: "",
         casier: "",
         entrepot: "",
+        stock: "",
+      });
+      setDonne_Stock({});
+      showMessage(
+        "success",
+        response.data.message || "Modification réussie ✅"
+      );
+    } catch (err) {
+      console.error(err.response?.data || err.message);
+      showMessage(
+        "error",
+        err.response?.data?.message || "Erreur lors de la modification ❌"
+      );
+    }
+  };
+  const tranfertStock = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.put(
+        `http://127.0.0.1:8000/api/transfertStock/${Donne_Stock.idProduit}/${Donne_Stock.id}/3`,
+        formDataSModification
+      );
+
+      listeStock();
+      handleSelect("STOCK", "STOCK");
+      setinsertionStock(false);
+
+      // Reset propre
+      setformDataSModification({
+        nomProduit: "",
+        stock_initia: "",
+        casier: "",
+        entrepot: "",
+        stockfinal: "",
+        casierfinal: "",
+        entrepotfinal: "",
       });
       setDonne_Stock({});
       showMessage(
@@ -585,6 +648,231 @@ export function Produit() {
     }
   };
 
+  // stock
+  const [OriginalListeCasier, setOriginalListeCasier] = useState([]);
+  const liste_Caisier = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(
+        "http://127.0.0.1:8000/api/liste_Caisier"
+      );
+      // console.log(response.data);
+      setOriginalListeCasier(response.data);
+    } catch (err) {
+      setError("Erreur lors du chargement de l'utilisateur.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  const [OriginalListeEntrepot, setOriginalListeEntrepot] = useState([]);
+  const liste_Entrepot = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(
+        "http://127.0.0.1:8000/api/liste_Entrepot"
+      );
+      // console.log(response.data);
+      setOriginalListeEntrepot(response.data);
+    } catch (err) {
+      setError("Erreur lors du chargement de l'utilisateur.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /// Inventaire
+  const [
+    listeProduitModifierInventairetableau,
+    setlisteProduitModifierInventairetableau,
+  ] = useState([]);
+
+  const [
+    OriginelisteProduitModifierInventairetableau,
+    setOriginelisteProduitModifierInventairetableau,
+  ] = useState([]);
+
+  const ColunneProduitModifier = [
+    { field: "id", headerName: "N°", width: 70 },
+    {
+      field: "referenceInventaire",
+      headerName: "REF",
+      width: 110,
+      renderCell: (params) => (
+        <div>
+          <a
+            href="#"
+            onClick={() => {
+              setDonne_PRODUIT(params.row);
+              handleSelect("detailPRODUIT_inventaire", "PRODUIT MODIFIER");
+            }}
+          >
+            {params.row.referenceInventaire}
+          </a>
+        </div>
+      ),
+    },
+    { field: "type_categorie", headerName: "TYPE", width: 110 },
+    { field: "categorie", headerName: "F/ER", width: 130 },
+    { field: "zone", headerName: "ZONE", width: 140 },
+    { field: "stock_initia", headerName: "STOCK TOTAL", width: 110 },
+    { field: "prix", headerName: "PRIX", width: 110 },
+    { field: "nomCasier", headerName: "U/TEUR", width: 130 },
+    { field: "etat", headerName: "ETAT", width: 110 },
+  ];
+  const listeProduitModifierInventaire = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(
+        "http://127.0.0.1:8000/api/listeProduitModifierInventaire"
+      );
+
+      setOriginelisteProduitModifierInventairetableau(response.data.data);
+      setlisteProduitModifierInventairetableau(response.data.data);
+    } catch (err) {
+      setError("Erreur lors du chargement de l'utilisateur.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const [
+    formDataSearcheTableauInventaire,
+    setformDataSearcheTableauInventaire,
+  ] = useState({
+    produit: "",
+    fournisseur: "",
+    zone: "",
+    entrepot: "",
+    casier: "",
+    etat: "",
+    type_categorie: "",
+  });
+
+  const handleChangeSearchetableauInventaire = (e) => {
+    const { name, value } = e.target;
+    setformDataSearcheTableauInventaire((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSearcheSubmittableInventaire = (e) => {
+    e.preventDefault();
+    const filtered = OriginelisteProduitModifierInventairetableau.filter(
+      (item) => {
+        const produit = item.nomProduit ? item.nomProduit.toLowerCase() : "";
+        const fournisseur = item.fournisseur
+          ? item.fournisseur.toLowerCase()
+          : "";
+        const zone = item.zone ? item.zone.toLowerCase() : "";
+        const entrepot = item.nomEntrepot ? item.nomEntrepot.toLowerCase() : "";
+        const casier = item.nomCasier ? item.nomCasier.toLowerCase() : "";
+        const etat = item.etat ? item.etat.toLowerCase() : "";
+        const type_categorie = item.type_categorie
+          ? item.type_categorie.toLowerCase()
+          : "";
+
+        return (
+          (formDataSearcheTableauInventaire.produit === "" ||
+            produit.includes(
+              formDataSearcheTableauInventaire.produit.toLowerCase()
+            )) &&
+          (formDataSearcheTableauInventaire.fournisseur === "" ||
+            fournisseur.includes(
+              formDataSearcheTableauInventaire.fournisseur.toLowerCase()
+            )) &&
+          (formDataSearcheTableauInventaire.zone === "" ||
+            zone.includes(
+              formDataSearcheTableauInventaire.zone.toLowerCase()
+            )) &&
+          (formDataSearcheTableauInventaire.entrepot === "" ||
+            entrepot.includes(
+              formDataSearcheTableauInventaire.entrepot.toLowerCase()
+            )) &&
+          (formDataSearcheTableauInventaire.casier === "" ||
+            casier.includes(
+              formDataSearcheTableauInventaire.casier.toLowerCase()
+            )) &&
+          (formDataSearcheTableauInventaire.etat === "" ||
+            etat.includes(
+              formDataSearcheTableauInventaire.etat.toLowerCase()
+            )) &&
+          (formDataSearcheTableauInventaire.type_categorie === "" ||
+            type_categorie.includes(
+              formDataSearcheTableauInventaire.type_categorie.toLowerCase()
+            ))
+        );
+      }
+    );
+
+    setlisteProduitModifierInventairetableau(filtered);
+  };
+
+  const handleRefreshtableauInventaire = () => {
+    setformDataSearcheTableauInventaire({
+      produit: "",
+      fournisseur: "",
+      zone: "",
+      entrepot: "",
+      casier: "",
+      etat: "",
+      type_categorie: "",
+    });
+    setlisteProduitModifierInventairetableau(
+      OriginelisteProduitModifierInventairetableau
+    );
+  };
+
+  const etat_PRODUIT_inventaire = async (idProduit, currentEtat) => {
+    const newStatus = currentEtat === "activer" ? "desactiver" : "activer";
+
+    try {
+      const response = await axios.put(
+        `http://127.0.0.1:8000/api/changer_activation_PRODUIT_inventaire/${idProduit}`,
+        { etat: newStatus }
+      );
+
+      listeProduitModifierInventaire();
+
+      handleSelect("PRODUIT MODIFIER", "PRODUIT MODIFIER");
+      showMessage("success", "Modification avec succès ");
+    } catch (err) {
+      console.error("❌ Erreur API :", err.response ? err.response.data : err);
+      setError("Erreur lors de la modification de l'activation ❌");
+    }
+  };
+
+  /// MODIFICATION
+  const [valeurPRODUIT_inventaire, setvaleurPRODUIT_inventaire] = useState([]);
+  const ModifePRODUIT_inventaire = async (e) => {
+    e.preventDefault();
+    try {
+      const formData = new FormData();
+
+      // Ajout des champs simples
+      Object.keys(Donne_PRODUIT).forEach((key) => {
+        if (key !== "fichier") {
+          formData.append(key, Donne_PRODUIT[key]);
+        }
+      });
+
+      // Ajout du fichier si présent
+      if (Donne_PRODUIT.fichier instanceof File) {
+        formData.append("fichier", Donne_PRODUIT.fichier);
+      }
+
+      const response = await axios.post(
+        `http://127.0.0.1:8000/api/modifier_PRODUIT_inventaire/${Donne_PRODUIT.id}?_method=PUT`,
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+
+      listeProduitModifierInventaire();
+
+      handleSelect("PRODUIT MODIFIER", "PRODUIT MODIFIER");
+      showMessage("success", "Modification avec succès ");
+    } catch (err) {
+      console.error(err);
+      setError("Erreur lors de la modification du produit ❌");
+    }
+  };
   React.useEffect(() => {
     if (formDataSearcheStock?.id) {
       setFormDataS((prev) => ({
@@ -595,7 +883,11 @@ export function Produit() {
   }, [formDataSearcheStock]);
 
   React.useEffect(() => {
-    listeStock();
+    liste_Entrepot();
+    liste_Caisier();
+    listeProduitModifierInventaire();
+    listeStock1();
+    listeCasi();
     listeP();
     handleSelect("PRODUIT", "PRODUIT");
     // handleSelect("ListePRODUIT", "PRODUIT");
@@ -624,7 +916,7 @@ export function Produit() {
             <h2 className="text-blue-600 font-semibold text-lg">
               {DonneSession.nom}
             </h2>
-            <p className="text-sm text-gray-500">{DonneSession.profil}</p>
+            <p className="text-sm text-gray-500">{DonneSession.groupe}</p>
           </div>
 
           {/* Menu */}
@@ -670,27 +962,659 @@ export function Produit() {
         <div className="flex-1 bg-gray-200 p-6">
           {/* Navbar */}
           <div className="flex justify-center text-lg font-bold mb-2">
-            {["PRODUIT", "PRIX", "STOCK", "DOCUMENT", "HISTORIQUE"].map(
-              (item) => (
-                <button
-                  key={item}
-                  className={`hover:border-b-blue-500 border border-gray-200 text-blue-500 py-1 px-10 ${
-                    condition_navbar === item ? "border-b-blue-500" : ""
-                  }`}
-                  onClick={() => handleSelect(item, item)}
-                >
-                  {item}
-                </button>
-              )
-            )}
+            {[
+              "PRODUIT",
+              "PRIX",
+              "STOCK",
+              "DOCUMENT",
+              "HISTORIQUE",
+              "PRODUIT MODIFIER",
+            ].map((item) => (
+              <button
+                key={item}
+                className={`hover:border-b-blue-500 border border-gray-200 text-blue-500 py-1 px-10 ${
+                  condition_navbar === item ? "border-b-blue-500" : ""
+                }`}
+                onClick={() => handleSelect(item, item)}
+              >
+                {item}
+              </button>
+            ))}
           </div>
+          {ActivationAffichage === "modification_PRODUIT_inventaire" &&
+            Donne_PRODUIT && (
+              <div>
+                <form
+                  onSubmit={ModifePRODUIT_inventaire}
+                  className="bg-white p-6 rounded-lg shadow-md  "
+                  encType="multipart/form-data"
+                >
+                  <h1 className="text-2xl font-bold text-blue-600 mb-6 text-center">
+                    MODIFICATION
+                  </h1>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Nom Produit
+                      </label>
+                      <input
+                        type="text"
+                        name="nomProduit"
+                        required
+                        value={Donne_PRODUIT.nomProduit || ""}
+                        onChange={(e) =>
+                          setDonne_PRODUIT({
+                            ...Donne_PRODUIT,
+                            nomProduit: e.target.value,
+                          })
+                        }
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md"
+                      />
+                    </div>
+                    {/* Prix */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Prix
+                      </label>
+                      <input
+                        type="number"
+                        name="prix"
+                        required
+                        value={Donne_PRODUIT.prix}
+                        onChange={(e) =>
+                          setDonne_PRODUIT({
+                            ...Donne_PRODUIT,
+                            prix: e.target.value,
+                          })
+                        }
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md"
+                      />
+                    </div>
+
+                    {/* Stock Initial */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Stock Initial
+                      </label>
+                      <input
+                        type="number"
+                        name="stock_initia"
+                        required
+                        value={Donne_PRODUIT.stock_initia || ""}
+                        onChange={(e) =>
+                          setDonne_PRODUIT({
+                            ...Donne_PRODUIT,
+                            stock_initia: e.target.value,
+                          })
+                        }
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md"
+                      />
+                    </div>
+
+                    {/* Zone */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Zone
+                      </label>
+                      <input
+                        type="text"
+                        name="zone"
+                        value={Donne_PRODUIT.zone || ""}
+                        onChange={(e) =>
+                          setDonne_PRODUIT({
+                            ...Donne_PRODUIT,
+                            zone: e.target.value,
+                          })
+                        }
+                        required
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md"
+                      />
+                    </div>
+
+                    {/* Fichier */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Fichier
+                      </label>
+                      <input
+                        type="file"
+                        name="fichier"
+                        onChange={(e) =>
+                          setDonne_PRODUIT({
+                            ...Donne_PRODUIT,
+                            fichier: e.target.files[0],
+                          })
+                        }
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100"
+                      />
+                    </div>
+
+                    {/* Catégorie */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Catégorie
+                      </label>
+
+                      <select
+                        name="categorie"
+                        value={Donne_PRODUIT.categorie || ""}
+                        required
+                        onChange={(e) =>
+                          setDonne_PRODUIT({
+                            ...Donne_PRODUIT,
+                            categorie: e.target.value,
+                          })
+                        }
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md"
+                      >
+                        <option value="Entretien">Entretien</option>
+                        <option value="Alimentation">Alimentation</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        TYPE CATEGORIE
+                      </label>
+
+                      <select
+                        name="type_categorie"
+                        value={Donne_PRODUIT.type_categorie || ""}
+                        required
+                        onChange={(e) =>
+                          setDonne_PRODUIT({
+                            ...Donne_PRODUIT,
+                            type_categorie: e.target.value,
+                          })
+                        }
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md"
+                      >
+                        <option value="Stock">Stock</option>
+                        <option value="Flotte">Flotte</option>
+                      </select>
+                    </div>
+
+                    {/* Code Compta */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Code Compta
+                      </label>
+                      <input
+                        type="text"
+                        name="code_compta"
+                        value={Donne_PRODUIT.code_compta || ""}
+                        onChange={(e) =>
+                          setDonne_PRODUIT({
+                            ...Donne_PRODUIT,
+                            code_compta: e.target.value,
+                          })
+                        }
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md"
+                      />
+                    </div>
+
+                    {/* Stock Minimum */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Stock Minimum
+                      </label>
+                      <input
+                        type="number"
+                        name="stock_minimum"
+                        value={Donne_PRODUIT.stock_minimum}
+                        onChange={(e) =>
+                          setDonne_PRODUIT({
+                            ...Donne_PRODUIT,
+                            stock_minimum: e.target.value,
+                          })
+                        }
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md"
+                      />
+                    </div>
+
+                    {/* Date Péremption */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Date de Péremption
+                      </label>
+                      <input
+                        type="date"
+                        name="date_peremption"
+                        value={Donne_PRODUIT.date_peremption || ""}
+                        onChange={(e) =>
+                          setDonne_PRODUIT({
+                            ...Donne_PRODUIT,
+                            date_peremption: e.target.value,
+                          })
+                        }
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Bouton */}
+                  <div className="flex gap-6 justify-end mt-6">
+                    <button
+                      type="submit"
+                      className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+                    >
+                      VALIDER
+                    </button>
+                    <button
+                      onClick={() =>
+                        handleSelect("PRODUIT MODIFIER", "PRODUIT MODIFIER")
+                      }
+                      className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
+                    >
+                      ANNULLER
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
+          {ActivationAffichage === "detailPRODUIT_inventaire" &&
+            Donne_PRODUIT && (
+              <div className=" ">
+                <div className="bg-white p-6 rounded-lg shadow-lg max-w-6xl mx-auto">
+                  <h1 className="text-2xl font-bold text-blue-600 mb-6 text-center">
+                    DÉTAIL Mr/Mn <strong>{Donne_PRODUIT.nomProduit}</strong>
+                  </h1>
+
+                  {/* Grille 3 colonnes */}
+                  <div className="flex justify-center">
+                    <img
+                      src={
+                        Donne_PRODUIT.fichier
+                          ? `http://127.0.0.1:8000/storage/${Donne_PRODUIT.fichier}`
+                          : "https://via.placeholder.com/100"
+                      }
+                      alt={Donne_PRODUIT.nomProduit}
+                      className="w-28 h-28 rounded-full object-cover border-4 border-cyan-500 shadow-md"
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-3">
+                      {/* p-3  rounded-lg flex gap-6 */}
+                      <span className="font-semibold text-gray-600">NOM :</span>
+                      <span className="block text-gray-800">
+                        <strong>{Donne_PRODUIT.nomProduit}</strong>
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-3">
+                      <span className="font-semibold text-gray-600">
+                        PRIX :
+                      </span>
+                      <span className="block text-gray-800">
+                        <strong>{Donne_PRODUIT.prix}</strong>
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2">
+                      <span className="font-semibold text-gray-600">
+                        STOCK INITIAL :
+                      </span>
+                      <span className="block text-gray-800">
+                        <strong>{Donne_PRODUIT.stock_initia}</strong>
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-3">
+                      <span className="font-semibold text-gray-600">
+                        zone :
+                      </span>
+                      <span className="block text-gray-800">
+                        <strong>{Donne_PRODUIT.zone}</strong>
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2">
+                      <span className="font-semibold text-gray-600">
+                        TYPE CATEGORIE :
+                      </span>
+                      <span className="block text-gray-800">
+                        <strong>{Donne_PRODUIT.type_categorie}</strong>
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-3">
+                      <span className="font-semibold text-gray-600">
+                        CATEGORIE :
+                      </span>
+                      <span className="block text-gray-800">
+                        <strong>{Donne_PRODUIT.categorie}</strong>
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2">
+                      <span className="font-semibold text-gray-600">
+                        CODE COMPTA :
+                      </span>
+                      <span className="block text-gray-800">
+                        <strong>{Donne_PRODUIT.code_compta}</strong>
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2">
+                      <span className="font-semibold text-gray-600">
+                        DATE PEREMPTION :
+                      </span>
+                      <span className="block text-gray-800">
+                        <strong>{Donne_PRODUIT.date_peremption}</strong>
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-3">
+                      <span className="font-semibold text-gray-600">
+                        ETAT :
+                      </span>
+                      <span className="block text-gray-800">
+                        <strong>{Donne_PRODUIT.etat}</strong>
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Bouton fermer centré */}
+                  <div className="mt-6 gap-8 flex justify-center">
+                    <button
+                      onClick={() =>
+                        etat_PRODUIT_inventaire(
+                          Donne_PRODUIT.id,
+                          Donne_PRODUIT.etat
+                        )
+                      }
+                      className={`${
+                        Donne_PRODUIT.etat === "activer"
+                          ? "px-6 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600"
+                          : "px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+                      }`}
+                    >
+                      {Donne_PRODUIT.etat === "activer"
+                        ? "DESACTIVER"
+                        : "ACTIVER"}
+                    </button>
+
+                    <button
+                      onClick={() =>
+                        // handleSelect("modification_PRODUIT_inventaire")
+                        handleSelect(
+                          "modification_PRODUIT_inventaire",
+                          "PRODUIT MODIFIER"
+                        )
+                      }
+                      className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+                    >
+                      MODIFIER
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+          {ActivationAffichage === "PRODUIT MODIFIER" && (
+            <div className="bg-white shadow-md rounded-2xl p-6 mb-6">
+              <div className="flex  items-center justify-end ">
+                <form
+                  onSubmit={handleSearcheSubmittableInventaire}
+                  className="grid grid-cols-9 gap-4 items-center"
+                >
+                  {/* PRODUIT */}
+                  <div>
+                    <label
+                      htmlFor="produit"
+                      className="font-semibold text-gray-700"
+                    >
+                      PRODUITS
+                    </label>
+                    <select
+                      id="produit"
+                      value={formDataSearcheTableauInventaire.produit}
+                      onChange={handleChangeSearchetableauInventaire}
+                      name="produit"
+                      className="w-[100%] px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value=""></option>
+                      {[
+                        ...new Set(
+                          OriginelisteProduitModifierInventairetableau.map(
+                            (item) => item.nomProduit
+                          )
+                        ),
+                      ].map((nomProduit, index) => (
+                        <option key={`nomProduit-${index}`} value={nomProduit}>
+                          {nomProduit}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* FOURNISSEUR */}
+                  <div>
+                    <label
+                      htmlFor="fournisseur"
+                      className="font-semibold text-gray-700"
+                    >
+                      FOURNISSEURS
+                    </label>
+                    <input
+                      name="fournisseur"
+                      value={formDataSearcheTableauInventaire.fournisseur}
+                      onChange={handleChangeSearchetableauInventaire}
+                      type="text"
+                      className="w-[100%] px-3 py-2 border border-gray-300 rounded-lg"
+                    />
+                  </div>
+
+                  {/* ZONE */}
+                  <div>
+                    <label
+                      htmlFor="zone"
+                      className="font-semibold text-gray-700"
+                    >
+                      ZONES
+                    </label>
+                    <select
+                      id="zone"
+                      value={formDataSearcheTableauInventaire.zone}
+                      onChange={handleChangeSearchetableauInventaire}
+                      name="zone"
+                      className="w-[100%] px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value=""></option>
+                      {[
+                        ...new Set(
+                          OriginelisteProduitModifierInventairetableau.map(
+                            (item) => item.zone
+                          )
+                        ),
+                      ].map((zone, index) => (
+                        <option key={`zone-${index}`} value={zone}>
+                          {zone}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* ENTREPOT */}
+                  <div>
+                    <label
+                      htmlFor="entrepot"
+                      className="font-semibold text-gray-700"
+                    >
+                      ENTREPOTS
+                    </label>
+                    <select
+                      id="entrepot"
+                      value={formDataSearcheTableauInventaire.entrepot}
+                      onChange={handleChangeSearchetableauInventaire}
+                      name="entrepot"
+                      className="w-[100%] px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value=""></option>
+                      {[
+                        ...new Set(
+                          OriginelisteProduitModifierInventairetableau.map(
+                            (item) => item.nomEntrepot
+                          )
+                        ),
+                      ].map((nomEntrepot, index) => (
+                        <option
+                          key={`nomEntrepot-${index}`}
+                          value={nomEntrepot}
+                        >
+                          {nomEntrepot}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* CASIER */}
+                  <div>
+                    <label
+                      htmlFor="casier"
+                      className="font-semibold text-gray-700"
+                    >
+                      CASIERS
+                    </label>
+                    <select
+                      id="casier"
+                      value={formDataSearcheTableauInventaire.casier}
+                      onChange={handleChangeSearchetableauInventaire}
+                      name="casier"
+                      className="w-[100%] px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value=""></option>
+                      {[
+                        ...new Set(
+                          OriginelisteProduitModifierInventairetableau.map(
+                            (item) => item.nomCasier
+                          )
+                        ),
+                      ].map((nomCasier, index) => (
+                        <option key={`nomCasier-${index}`} value={nomCasier}>
+                          {nomCasier}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* ETAT */}
+                  <div>
+                    <label
+                      htmlFor="etat"
+                      className="font-semibold text-gray-700"
+                    >
+                      ETAT
+                    </label>
+                    <select
+                      value={formDataSearcheTableauInventaire.etat}
+                      onChange={handleChangeSearchetableauInventaire}
+                      id="etat"
+                      name="etat"
+                      className="w-[100%] px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value=""></option>
+                      {[
+                        ...new Set(
+                          OriginelisteProduitModifierInventairetableau.map(
+                            (item) => item.etat
+                          )
+                        ),
+                      ].map((etat, index) => (
+                        <option key={`etat-${index}`} value={etat}>
+                          {etat}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* TYPE */}
+                  <div>
+                    <label
+                      htmlFor="type_categorie"
+                      className="font-semibold text-gray-700"
+                    >
+                      TYPE
+                    </label>
+                    <select
+                      value={formDataSearcheTableauInventaire.type_categorie}
+                      onChange={handleChangeSearchetableauInventaire}
+                      name="type_categorie"
+                      id="type_categorie"
+                      className="w-[100%] px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value=""></option>
+                      {[
+                        ...new Set(
+                          OriginelisteProduitModifierInventairetableau.map(
+                            (item) => item.type_categorie
+                          )
+                        ),
+                      ].map((type_categorie, index) => (
+                        <option
+                          key={`type_categorie-${index}`}
+                          value={type_categorie}
+                        >
+                          {type_categorie}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* BOUTONS */}
+                  <div>
+                    <label className="font-semibold text-white">K</label>
+                    <button
+                      type="submit"
+                      className="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600 transition"
+                    >
+                      FILTRER
+                    </button>
+                  </div>
+                  <div>
+                    <label className="font-semibold text-white">K</label>
+                    <button
+                      onClick={handleRefreshtableauInventaire}
+                      type="button"
+                      className=" bg-gray-500 text-white py-2 px-2 rounded-lg hover:bg-gray-600 transition"
+                    >
+                      RAFRAICHIR
+                    </button>
+                  </div>
+                </form>
+              </div>
+              {message && (
+                <div
+                  className={` right-4 bg-green-300 text-white pt-6 pb-6 px-[20%] text-center m-8 rounded shadow-md
+      ${message.type === "success" ? "bg-green-500 text-white" : ""}
+      ${message.type === "error" ? "bg-red-500 text-white" : ""}
+      ${message.type === "warning" ? "bg-orange-500 text-white" : ""}`}
+                >
+                  {message.text}
+                </div>
+              )}
+              <Box sx={{ height: "55vh" }}>
+                <DataGrid
+                  rows={listeProduitModifierInventairetableau}
+                  columns={ColunneProduitModifier}
+                  getRowId={(row) => row.idInventaire} // 👈 changer ici
+                  pageSize={5}
+                  rowsPerPageOptions={[5, 10]}
+                  loading={loading}
+                  sx={{
+                    "& .MuiDataGrid-columnHeaders": {
+                      backgroundColor: "#3B82F6",
+                    },
+                    "& .MuiDataGrid-columnHeaderTitle": {
+                      color: "#fff",
+                      fontWeight: "bold",
+                    },
+                    "& .MuiDataGrid-columnHeader": {
+                      backgroundColor: "#3B82F6",
+                      color: "#fff",
+                    },
+                  }}
+                />
+              </Box>
+            </div>
+          )}
           {(ActivationAffichage === "PRODUIT" ||
             ActivationAffichage === "ListePRODUIT") && (
             <div className="bg-white shadow-md rounded-2xl p-6 mb-6">
               <div className="flex  items-center justify-end ">
-                {/* <h1 className="text-2xl font-bold text-blue-600 mb-4 md:mb-0">
-                  LISTE PRODUIT
-                </h1> */}
                 <form
                   onSubmit={handleSearcheSubmit}
                   className="grid grid-cols-9 gap-4 items-center"
@@ -1415,7 +2339,6 @@ export function Produit() {
               </form>
             </div>
           )}
-
           {ActivationAffichage === "PRIX" && (
             <div className="  p-0 m-0">
               <div className="bg-white p-8 rounded-2xl shadow-lg ">
@@ -1591,14 +2514,22 @@ export function Produit() {
                         <label className="w-32 font-medium text-gray-700">
                           ENTREPOT :
                         </label>
-                        <input
-                          type="text"
+
+                        <select
                           name="entrepot"
+                          required
                           value={formDataS.entrepot}
                           onChange={handleChangeS}
-                          required
                           className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
+                        >
+                          <option value=""></option>
+
+                          {OriginalListeEntrepot.map((item) => (
+                            <option key={item.id} value={item.id}>
+                              {item.nom}
+                            </option>
+                          ))}
+                        </select>
                         <span className="text-red-600"> ***</span>
                       </div>
 
@@ -1606,14 +2537,30 @@ export function Produit() {
                         <label className="w-32 font-medium text-gray-700">
                           CASIER :
                         </label>
-                        <input
-                          type="text"
-                          name="casier"
+
+                        <select
                           value={formDataS.casier}
                           onChange={handleChangeS}
-                          required
+                          id="casier"
+                          name="casier"
                           className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
+                        >
+                          <option value=""></option>
+                          {/* {[
+                            ...new Set(
+                              OriginalListe.map((item) => item.casier)
+                            ),
+                          ].map((casier, index) => (
+                            <option key={`casier-${index}`} value={casier}>
+                              {casier}
+                            </option>
+                          ))} */}
+                          {OriginalListeEntrepot.map((item) => (
+                            <option key={item.id} value={item.id}>
+                              {item.nom}
+                            </option>
+                          ))}
+                        </select>
                         <span className="text-red-600"> ***</span>
                       </div>
 
@@ -1982,118 +2929,131 @@ export function Produit() {
               <h1 className="text-center text-2xl font-bold text-blue-600 mb-6">
                 TRANSFER
               </h1>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div className="">
-                  <label className="w-32 font-medium text-gray-700">
-                    PRODUIT :
-                  </label>
-                  <br />
-                  <input
-                    type="text"
-                    disabled
-                    name="entrepot"
-                    value={Donne_Stock.nomProduit}
-                    required
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                <div className="">
-                  <label className="w-32 font-medium text-gray-700">
-                    STOCK ACTUEL :
-                  </label>
-                  <br />
-                  <input
-                    type="text"
-                    disabled
-                    name="entrepot"
-                    value={Donne_Stock.stock_initia}
-                    required
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6"></div>
 
+              <form onSubmit={tranfertStock}>
                 <div className="">
-                  <label className="w-32 font-medium text-gray-700">
-                    ENTREPOT D'ORIGINE :
-                  </label>
-                  <input
-                    type="text"
-                    disabled
-                    name="entrepot"
-                    value={Donne_Stock.entrepot}
-                    required
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-
-                <div className="">
-                  <label className="w-32 font-medium text-gray-700">
-                    CASIER :<span className="text-white">qkfhsqsfq</span>
-                  </label>
-                  <br />
-                  <input
-                    type="text"
-                    disabled
-                    name="entrepot"
-                    value={Donne_Stock.casier}
-                    required
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-              </div>
-
-              <form onSubmit={modifeStock}>
-                <div className="grid grid-cols-1 md:grid-cols-3 mt-6 gap-6">
                   {/* ENTREPOT */}
+                  <div className="grid grid-cols-1 md:grid-cols-4 mt-6 gap-6">
+                    <div className="">
+                      <label className="w-32 font-medium text-gray-700">
+                        PRODUIT :
+                      </label>
+                      <br />
+                      <input
+                        type="text"
+                        disabled
+                        name="nomProduit"
+                        value={Donne_Stock.nomProduit}
+                        onChange={handleChangeSm}
+                        required
+                        className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div className="">
+                      <label className="w-32 font-medium text-gray-700">
+                        STOCK ACTUEL :
+                      </label>
+                      <br />
+                      <input
+                        type="text"
+                        disabled
+                        name="stock_initia"
+                        value={Donne_Stock.stock_initia}
+                        onChange={handleChangeSm}
+                        required
+                        className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
 
-                  <div className=" items-center gap-4">
-                    <label className="w-32 font-medium text-gray-700">
-                      STOCK NOUVEL :
-                    </label>
-                    <input
-                      type="text"
-                      name="stock"
-                      onChange={handleChangeSm}
-                      required
-                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
+                    <div className="">
+                      <label className="w-32 font-medium text-gray-700">
+                        ENTREPOT D'ORIGINE :
+                      </label>
+                      <input
+                        type="text"
+                        disabled
+                        name="entrepot"
+                        value={Donne_Stock.entrepot}
+                        onChange={handleChangeSm}
+                        required
+                        className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+
+                    <div className="">
+                      <label className="w-32 font-medium text-gray-700">
+                        CASIER :<span className="text-white">qkfhsqsfq</span>
+                      </label>
+                      <br />
+                      <input
+                        type="text"
+                        disabled
+                        name="entrepot"
+                        value={Donne_Stock.casier}
+                        onChange={handleChangeSm}
+                        required
+                        className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
                   </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 mt-6 gap-6">
+                    {" "}
+                    <div className=" items-center gap-4">
+                      <label className="w-32 font-medium text-gray-700">
+                        STOCK NOUVEL :
+                      </label>
+                      <input
+                        type="text"
+                        name="stockfinal"
+                        onChange={handleChangeSm}
+                        required
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div className="  ">
+                      <label className="w-32 font-medium text-gray-700">
+                        ENTREPOT CHOISI:
+                      </label>
+                      <br />
+                      <select
+                        name="entrepotfinal"
+                        onChange={handleChangeSm}
+                        required
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="">...</option>
+                        {[
+                          ...new Set(ListeStock.map((item) => item.entrepot)),
+                        ].map((entrepot, index) => (
+                          <option key={`entrepot-${index}`} value={entrepot}>
+                            {entrepot}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="">
+                      <label className="w-32 font-medium text-gray-700">
+                        CASIER :
+                      </label>
+                      <br />
 
-                  <div className="  ">
-                    <label className="w-32 font-medium text-gray-700">
-                      ENTREPOT CHOISI:
-                    </label>
-                    <br />
-                    <select
-                      name="entrepot"
-                      onChange={handleChangeSm}
-                      required
-                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      <option value="">...</option>
-                      {[
-                        ...new Set(ListeStock.map((item) => item.entrepot)),
-                      ].map((entrepot, index) => (
-                        <option key={`entrepot-${index}`} value={entrepot}>
-                          {entrepot}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="">
-                    <label className="w-32 font-medium text-gray-700">
-                      CASIER :
-                    </label>
-                    <br />
-                    <input
-                      type="text"
-                      name="casier"
-                      onChange={handleChangeSm}
-                      // value={Donne_Stock.casier}
-                      required
-                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
+                      <select
+                        name="casierfinal"
+                        onChange={handleChangeSm}
+                        required
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="">...</option>
+                        {[...new Set(listeCasier.map((item) => item.nom))].map(
+                          (nom, index) => (
+                            <option key={`nom-${index}`} value={nom}>
+                              {nom}
+                            </option>
+                          )
+                        )}
+                      </select>
+                    </div>
                   </div>
                 </div>
 

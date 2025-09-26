@@ -77,7 +77,7 @@ export function NavbarFournisseur({ value }) {
                 : "text-white hover:underline"
             }`}
           >
-            Article
+            STOCK
           </NavLink>
 
           {/* Utilisateur Desktop */}

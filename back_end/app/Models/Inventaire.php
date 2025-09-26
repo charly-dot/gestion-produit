@@ -5,23 +5,21 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Entrepot extends Model
+class Inventaire extends Model
 {
     use HasFactory;
+
     protected $fillable = [
-        'nom',
-        'etat',
-        'zone',
+        'date',
+        'idEntrepot',
         'idCasier',
-        'stock',
-        'stockTotal',
-        'idUtilisateur',
         'idProduit',
-        'action',
+        'dateCreation',
+        'reference',
         'colone1',
         'colone2',
         'colone3',
         'colone4',
-        'colone5'
+        'colone5',
     ];
 }

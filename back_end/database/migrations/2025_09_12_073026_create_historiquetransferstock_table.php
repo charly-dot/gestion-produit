@@ -14,23 +14,23 @@ return new class extends Migration
         Schema::create('historiquetransferstocks', function (Blueprint $table) {
             $table->id();
             $table->string('date')->nullable();
-            $table->string('idEntrepot')->nullable();
-            $table->string('entrepotSource')->nullable();
-            $table->string('entrepotFinal')->nullable();
-            $table->string('idCasier')->nullable();
-            $table->string('casierSource')->nullable();
-            $table->string('casierFinal')->nullable();
-            $table->string('idProduit')->nullable();
-            $table->string('produit')->nullable();
-            $table->string('stock')->nullable();
+            $table->bigInteger('idEntrepot')->nullable();
+            $table->bigInteger('entrepotSource')->nullable();
+            $table->bigInteger('entrepotFinal')->nullable();
+            $table->bigInteger('idCasier')->nullable();
+            $table->bigInteger('casierSource')->nullable();
+            $table->bigInteger('casierFinal')->nullable();
+            $table->bigInteger('idProduit')->nullable();
+            $table->bigInteger('produit')->nullable();
+            $table->bigInteger('stock')->nullable();
             $table->string('action')->nullable();
-            $table->string('utilisateur')->nullable();
+            $table->bigInteger('utilisateur')->nullable();
             $table->string('zone')->nullable();
             $table->string('colone1')->nullable();
             $table->string('colone2')->nullable();
             $table->string('colone3')->nullable();
-            $table->string('colone4')->nullable();
-            $table->string('colone5')->nullable();
+            $table->bigInteger('colone4')->nullable();
+            $table->bigInteger('colone5')->nullable();
             $table->timestamps();
         });
     }

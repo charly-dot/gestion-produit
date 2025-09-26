@@ -16,15 +16,15 @@ return new class extends Migration
             $table->string('nom')->nullable();
             $table->string('type')->nullable();
             $table->string('etat')->nullable();
-            $table->string('idFournisseur')->nullable();
-            $table->string('idEntrepot')->nullable();
+            $table->bigInteger('idFournisseur')->nullable();
+            $table->bigInteger('idEntrepot')->nullable();
             $table->string('idUtilisateur')->nullable();
-            $table->string('stock')->nullable();
+            $table->bigInteger('stock')->nullable();
             $table->string('colone1')->nullable();
             $table->string('colone2')->nullable();
             $table->string('colone3')->nullable();
-            $table->string('colone4')->nullable();
-            $table->string('colone5')->nullable();
+            $table->bigInteger('colone4')->nullable();
+            $table->bigInteger('colone5')->nullable();
 
             $table->timestamps();
         });

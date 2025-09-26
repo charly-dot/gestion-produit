@@ -444,6 +444,12 @@ export function Article_Service() {
             <h1 className="cursor-pointer text-sm font-semibold text-gray-700  py-2 px-3 rounded-md hover:bg-blue-500 hover:text-white transition">
               <Link to="/produits_tiers">PRODUIT</Link>
             </h1>
+            <h1 className="cursor-pointer text-sm font-semibold text-gray-700  py-2 px-3 rounded-md hover:bg-blue-500 hover:text-white transition">
+              <Link to="/CASIER">CASIER</Link>
+            </h1>
+            <h1 className="cursor-pointer text-sm font-semibold text-gray-700  py-2 px-3 rounded-md hover:bg-blue-500 hover:text-white transition">
+              <Link to="/ENTREPOT">ENTREPOT</Link>
+            </h1>
             <a
               onClick={() => handleSelect("HISTORIQUE", "HISTORIQUE")}
               className="block cursor-pointer text-gray-600 text-sm py-1 px-2 rounded hover:bg-blue-400 hover:text-white transition"

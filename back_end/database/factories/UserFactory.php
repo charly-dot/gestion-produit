@@ -15,27 +15,33 @@ class UserFactory extends Factory
         $sexe = $this->faker->randomElement(['Homme', 'Femme']);
 
         return [
-            'name' => $this->faker->lastName,
-            'prenom' => $this->faker->firstName($sexe === 'Homme' ? 'male' : 'female'),
-            'email' => $this->faker->unique()->safeEmail,
-            'password' => bcrypt('password'), // mot de passe par défaut
-            'sexe' => $sexe,
-            'groupe' => $this->faker->randomElement(['admin', 'editeur', 'user']),
-            'contact' => $this->faker->phoneNumber,
+            'name'       => $this->faker->lastName,
+            'prenom'     => $this->faker->firstName($sexe === 'Homme' ? 'male' : 'female'),
+            'email'      => $this->faker->unique()->safeEmail,
+            'password'   => bcrypt('password'), // mot de passe par défaut
+            'sexe'       => $sexe,
 
-            // Permissions (1 = activé)
-            'lecture' => 1,
+            // ✅ Groupe métier plus réaliste
+            'groupe'     => $this->faker->randomElement(['fournisseur', 'consommateur', 'entité']),
+
+            'contact'    => $this->faker->phoneNumber,
+
+            // ✅ Permissions aléatoires
+            'lecture'     => 1,
             'suppression' => 1,
             'modification' => 1,
-            'creation' => 1,
-            'activation' => 1,
+            'creation'    => 1,
+            'activation' => $this->faker->randomElement(['Activé', 'Désactivé']),
 
-            'colone' => $this->faker->word,
-            'colonee' => $this->faker->word,
-            'colone3' => $this->faker->word,
-            'colone4' => $this->faker->word,
-            'colone5' => $this->faker->word,
-            'profil' => $this->faker->randomElement(['superadmin', 'manager', 'staff']),
+            // ✅ Colonnes factices (mais plus parlantes)
+            'colone'   => 1,
+            'colonee'  => 1,
+            'colone3'  => 1,
+            'colone4'  => 1,
+            'colone5'  => 1,
+
+            // ✅ Profil lié au groupe
+            'profil'   => $this->faker->randomElement(['superadmin', 'manager', 'staff']),
 
             'remember_token' => Str::random(10),
         ];

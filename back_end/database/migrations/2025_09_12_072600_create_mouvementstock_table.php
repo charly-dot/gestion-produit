@@ -14,24 +14,26 @@ return new class extends Migration
         Schema::create('mouvementstocks', function (Blueprint $table) {
             $table->id();
             $table->string('date')->nullable();
-            $table->string('idEntrepot')->nullable();
-            $table->string('entrepot')->nullable();
-            $table->string('idCasier')->nullable();
-            $table->string('casier')->nullable();
-            $table->string('idProduit')->nullable();
-            $table->string('produit')->nullable();
-            $table->string('stock')->nullable();
+            $table->bigInteger('idEntrepot')->nullable();
+            $table->bigInteger('entrepot')->nullable();
+            $table->bigInteger('idCasier')->nullable();
+            $table->bigInteger('casier')->nullable();
+            $table->bigInteger('idProduit')->nullable();
+            $table->bigInteger('produit')->nullable();
+            $table->bigInteger('stock')->nullable();
             $table->string('action')->nullable();
-            $table->string('utilisateur')->nullable();
+            $table->bigInteger('utilisateur')->nullable();
             $table->string('zone')->nullable();
-            $table->string('stockCour')->nullable();
-            $table->string('stockFinal')->nullable();
+            $table->bigInteger('stockCour')->nullable();
+            $table->bigInteger('stockFinal')->nullable();
             $table->string('documentLier')->nullable();
+            $table->string('raison')->nullable();
             $table->string('colone1')->nullable();
             $table->string('colone2')->nullable();
             $table->string('colone3')->nullable();
-            $table->string('colone4')->nullable();
-            $table->string('colone5')->nullable();
+            $table->bigInteger('colone4')->nullable();
+            $table->bigInteger('colone5')->nullable();
+            $table->timestamps();
         });
     }
 

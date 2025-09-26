@@ -17,13 +17,14 @@ return new class extends Migration
             $table->boolean('suppression')->default(1)->after('lecture');
             $table->boolean('modification')->default(1)->after('suppression');
             $table->boolean('creation')->default(1)->after('modification');
-            $table->boolean('activation')->default(1)->after('creation');
+            $table->string('activation')->after('creation');
             $table->string('colone')->nullable()->after('activation');
             $table->string('colonee')->nullable()->after('colone');
             $table->string('colone3')->nullable()->after('colonee');
-            $table->string('colone4')->nullable()->after('colone3');
-            $table->string('colone5')->nullable()->after('colone4');
+            $table->bigInteger('colone4')->nullable()->after('colone3');
+            $table->bigInteger('colone5')->nullable()->after('colone4');
             $table->string('profil')->nullable()->after('colone5');
+            // $table->timestamps();
         });
     }
 

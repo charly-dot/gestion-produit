@@ -63,7 +63,6 @@ const router = createBrowserRouter([
       </ProtectedRoute>
     ),
   },
-
   {
     path: "/ENTREPOT",
     element: (
@@ -75,6 +74,7 @@ const router = createBrowserRouter([
       </ProtectedRoute>
     ),
   },
+
   {
     path: "/Article_Service",
     element: (

@@ -12,15 +12,22 @@ class Stock extends Model
 
     protected $fillable = [
         'nomProduit',
-        'idProduit',
+        'nom',
         'entrepot',
         'casier',
-        'colonne',
-        'colonnes',
+        'colone1',
+        'colone2',
+        'colone3',
+        'colone4',
+        'colone5',
     ];
 
     public function produit()
     {
         return $this->belongsTo(Produit::class, 'idProduit');
     }
+    // public function casier()
+    // {
+    //     return $this->belongsTo(Casier::class, 'casier', 'id');
+    // }
 }

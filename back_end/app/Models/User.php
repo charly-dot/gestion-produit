@@ -57,4 +57,16 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    // ✅ Relation inverse
+    public function historiques()
+    {
+        return $this->hasMany(Historiquetransferstock::class, 'colone5', 'id');
+    }
+
+    // User.php
+    // public function mouvements()
+    // {
+    //     return $this->hasMany(Mouvementstock::class, 'colone5', 'id');
+    // }
 }
