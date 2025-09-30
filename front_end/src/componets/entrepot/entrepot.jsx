@@ -55,21 +55,26 @@ export function Entrepot() {
     // setcondition_navbar(navbar);
   };
 
-  // const listeP = async () => {
-  //   setLoading(true);
-  //   try {
-  //     const response = await axios.get(
-  //       "http://127.0.0.1:8000/api/liste_Produit"
-  //     );
-  //     // console.log(response.data);
-  //     setListeProduit(response.data);
-  //     setOriginalListe(response.data);
-  //   } catch (err) {
-  //     setErrors("Erreur lors du chargement de l'utilisateur.");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+  // const [produit_nom_filtre, setproduit_nom_filtre] = useState([]);
+  const listeP = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(
+        "http://127.0.0.1:8000/api/liste_Produit"
+      );
+
+      setListeProduit(response.data);
+      setOriginalListe(response.data);
+      setproduit_nom_filtre(response.data);
+      // console.log("resultat");
+      // console.log(response.data);
+      // console.log("resultat");
+    } catch (err) {
+      setErrors("Erreur lors du chargement de l'utilisateur.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
@@ -109,18 +114,16 @@ export function Entrepot() {
     },
   ];
 
-  //   LISTE Casier
-  const [ListeC, setListeC] = useState([]);
-  const ColunneC = [
-    { field: "id", headerName: "N°", width: 10 },
-    { field: "DateCasier", headerName: "DATE", width: 150 },
-    { field: "nomEntrepot", headerName: "ENTREPOT", width: 140 },
-    { field: "nomCasier", headerName: "CASIER", width: 145 },
-    { field: "produit", headerName: "PRODUIT", width: 145 },
-    { field: "nomStock", headerName: "STOCK", width: 145 },
-    { field: "utilisateur", headerName: "UTILISATEUR", width: 140 },
-    { field: "stockTotal", headerName: "QUANTITER", width: 100 },
-  ];
+  // const ColunneC = [
+  //   { field: "id", headerName: "N°", width: 10 },
+  //   { field: "DateCasier", headerName: "DATE", width: 150 },
+  //   { field: "nomEntrepot", headerName: "ENTREPOT", width: 140 },
+  //   { field: "nomCasier", headerName: "CASIER", width: 145 },
+  //   { field: "nomProduit", headerName: "PRODUIT", width: 145 },
+  //   { field: "nomStock", headerName: "STOCK", width: 145 },
+  //   { field: "name", headerName: "UTILISATEUR", width: 140 },
+  // ];
+  const [ListeC, setListeC] = useState({});
   const listeC = async () => {
     setLoading(true);
     try {
@@ -133,6 +136,9 @@ export function Entrepot() {
         id: index + 1, // ou item.id si ton API renvoie un id unique
         ...item,
       }));
+      // console.log("debutenregistrement");
+      // console.log(dataWithId);
+      // console.log("finenregistrement");
 
       setListeC(dataWithId);
       setOriginalC(dataWithId);
@@ -145,7 +151,6 @@ export function Entrepot() {
 
   // INSERTION Casier
   const [donneCasierCreer, setdonneCasierCreer] = useState({});
-
   const ajouterCasier = async (e) => {
     e.preventDefault();
     setError("");
@@ -174,6 +179,7 @@ export function Entrepot() {
 
       setformData({ nom: "", etat: "" });
       listeC();
+      liste_Casier_tout();
       handleSelectType("casiercree");
       handleSelect("FicheCasier", "casiercree");
       showMessage("success", response.data.message);
@@ -198,6 +204,67 @@ export function Entrepot() {
       handleSelect("FicheCasier", "casiercree");
     }
   };
+  // const ajouterCasier = async (e) => {
+  //   e.preventDefault();
+  //   setError("");
+  //   setSuccess(false);
+
+  //   try {
+  //     const data = new FormData();
+  //     for (const key in formData) {
+  //       data.append(key, formData[key]);
+  //     }
+  //     const response = await axios.post(
+  //       `http://127.0.0.1:8000/api/creationCasier/${DonneSession.id}`,
+  //       data,
+  //       { headers: { "Content-Type": "multipart/form-data" } }
+  //     );
+
+  //     setdonneCasierCreer({
+  //       ...response.data.data,
+  //       totalGeneral: response.data.totalGeneral,
+  //     });
+
+  //     setdonneCasierCreer({
+  //       ...response.data.data,
+  //       totalGeneral: response.data.totalGeneral,
+  //     });
+
+  //     setformData({ nom: "", etat: "" });
+  //     listeC();
+  //     handleSelectType("casiercree");
+  //     handleSelect("FicheCasier", "casiercree");
+  //     showMessage("success", response.data.message);
+  //     console.log("tsy mety");
+  //     console.log("tsy mety");
+  //     console.log("tsy mety");
+  //     console.log("tsy mety");
+  //     // setformData({ nom: "", etat: "" });
+  //     // listeC();
+  //     // handleSelectType("casiercree");
+  //     // handleSelect("FicheCasier", "casiercree");
+  //     // showMessage("success", response.data.message);
+  //   } catch (err) {
+  //     if (err.response) {
+  //       setdonneCasierCreer({
+  //         ...err.response.data.data,
+  //         totalGeneral: err.response.data.totalGeneral,
+  //       });
+  //     } else {
+  //       showMessage("error", "Erreur réseau");
+  //     }
+  //     // console.log("dddddddddd");
+  //     console.log({
+  //       ...response.data.data,
+  //       totalGeneral: response.data.totalGeneral,
+  //     });
+  //     setformData({ nom: "", etat: "" });
+  //     handleSelectType("casiercree");
+  //     handleSelect("FicheCasier", "casiercree");
+  //     handleSelectType("casiercree");
+  //     handleSelect("FicheCasier", "casiercree");
+  //   }
+  // };
 
   ///stock de HISTORIQUE
 
@@ -239,7 +306,7 @@ export function Entrepot() {
       });
 
       showMessage("success", res.data.message);
-      console.log("TOTAL GENERAL :", res.data.totalGeneral);
+      // console.log("TOTAL GENERAL :", res.data.totalGeneral);
     } catch (err) {
       const res = err.response;
       if (res) {
@@ -276,6 +343,7 @@ export function Entrepot() {
       });
 
       listeC();
+      liste_Casier_tout();
       handleSelectType("casiercree");
       handleSelect("FicheCasier", "casiercree");
       showMessage("success", response.data.message);
@@ -297,6 +365,7 @@ export function Entrepot() {
       );
 
       listeC();
+      liste_Casier_tout();
       handleSelectType("casiercree");
       handleSelect("Listecasier", "casiercree");
       showMessage("success", response.data.message);
@@ -497,7 +566,7 @@ export function Entrepot() {
       setProduits(res.data.data);
 
       showMessage("success", res.data.message);
-      console.log(res.data.data);
+      // console.log(res.data.data);
     } catch (err) {
       const res = err.response;
       if (res) {
@@ -536,7 +605,7 @@ export function Entrepot() {
         nom: donneEntrepotCreer.nom,
         etat: donneEntrepotCreer.etat,
         zone: donneEntrepotCreer.zone,
-        casier: donneEntrepotCreer.idCasier, // ✅ c’est bien l'id
+        casier: donneEntrepotCreer.idCasier,
       };
 
       const res = await axios.post(
@@ -544,13 +613,26 @@ export function Entrepot() {
         payload
       );
 
+      // setdonneEntrepotCreer({
+      //   ...res.data.data,
+      //   totalGeneral: res.data.totalGeneral,
+      // });
       setdonneEntrepotCreer({
-        ...res.data.data,
+        ...res.data.data[0], // prend le premier élément du tableau retourné
         totalGeneral: res.data.totalGeneral,
       });
 
+      setEntrepot({
+        ...res.data.data[0],
+        totalGeneral: res.data.totalGeneral,
+      });
+
+      setProduits(res.data.data);
+
       showMessage("success", res.data.message);
-      console.log("TOTAL GENERAL :", res.data.totalGeneral);
+      // console.log("debut mety  :");
+      // console.log(res.data.data);
+      // console.log("fin mety  :");
     } catch (err) {
       const res = err.response;
       if (res) {
@@ -560,7 +642,9 @@ export function Entrepot() {
         });
 
         showMessage("error", res.data.message || "Erreur serveur");
-        console.log("TOTAL GENERAL (ERREUR) :", res.data.totalGeneral);
+        console.log("debut tsy mety  :");
+        console.log(res.data.data);
+        console.log("fin tsy mety  :");
       } else {
         showMessage("error", "Erreur réseau");
       }
@@ -571,7 +655,6 @@ export function Entrepot() {
       setLoading(false);
     }
   };
-
   const etat_entrepot = async (id, currentEtat) => {
     const newStatus = currentEtat === "activer" ? "desactiver" : "activer";
 
@@ -581,19 +664,55 @@ export function Entrepot() {
         { activation: newStatus }
       );
 
-      // mettre à jour l'état local
       setdonneEntrepotCreer({
-        ...response.data.data,
+        ...donneEntrepotCreer,
+        ...response.data.data[0], // premier élément de la liste
         totalGeneral: response.data.totalGeneral,
       });
 
+      setEntrepot({
+        ...response.data.data[0],
+        totalGeneral: response.data.totalGeneral,
+      });
+
+      setProduits(response.data.data);
+
       showMessage("success", response.data.message);
-      console.log("TOTAL GENERAL :", response.data.totalGeneral);
     } catch (err) {
       console.error(err);
       setError("Erreur lors de la modification de l'activation ❌");
     }
   };
+
+  // const etat_entrepot = async (id, currentEtat) => {
+  //   const newStatus = currentEtat === "activer" ? "desactiver" : "activer";
+
+  //   try {
+  //     const response = await axios.post(
+  //       `http://127.0.0.1:8000/api/changer_activation_entrepot/${id}`,
+  //       { activation: newStatus }
+  //     );
+
+  //     setdonneEntrepotCreer({
+  //       ...donneEntrepotCreer, // garder l’ancien id
+  //       ...response.data.data,
+  //       totalGeneral: response.data.totalGeneral,
+  //     });
+
+  //     setEntrepot({
+  //       ...res.data.data[0],
+  //       totalGeneral: res.data.totalGeneral,
+  //     });
+
+  //     setProduits(res.data.data);
+
+  //     showMessage("success", response.data.message);
+  //     // console.log("TOTAL GENERAL :", response.data.totalGeneral);
+  //   } catch (err) {
+  //     console.error(err);
+  //     setError("Erreur lors de la modification de l'activation ❌");
+  //   }
+  // };
   const suppression_entrepots = async (id) => {
     if (!window.confirm("⚠️ Voulez-vous vraiment supprimer ce entrepot ?")) {
       return;
@@ -786,6 +905,7 @@ export function Entrepot() {
     etat: "",
     casier: "",
     zone: "",
+    date: "",
   });
 
   const handleChangeSearcheHistoriqueENTREPOT = (e) => {
@@ -835,6 +955,10 @@ export function Entrepot() {
         !formDataSearcheHistoriqueENTREPOT.zone ||
         (item.zone || "").toLowerCase() ===
           formDataSearcheHistoriqueENTREPOT.zone.toLowerCase();
+      const matchdate =
+        !formDataSearcheHistoriqueENTREPOT.date ||
+        (item.date || "").toLowerCase() ===
+          formDataSearcheHistoriqueENTREPOT.date.toLowerCase();
 
       return (
         matchEntrepot &&
@@ -842,6 +966,7 @@ export function Entrepot() {
         matchProduit &&
         matchCasier &&
         matchEtat &&
+        matchdate &&
         matchZone
       );
     });
@@ -858,6 +983,7 @@ export function Entrepot() {
       etat: "",
       casier: "",
       zone: "",
+      date: "",
     });
 
     setListeHistoriqueStockENTREPOT(OrigineListeHistoriqueStockENTREPOT);
@@ -1091,12 +1217,411 @@ export function Entrepot() {
     }
   };
 
+  const [
+    listeProduitModifierInventairetableau,
+    setlisteProduitModifierInventairetableau,
+  ] = useState([]);
+
+  const [
+    OriginelisteProduitModifierInventairetableau,
+    setOriginelisteProduitModifierInventairetableau,
+  ] = useState([]);
+
+  const ColunneProduitModifier = [
+    {
+      field: "referenceInventaire",
+      headerName: "REF",
+      width: 110,
+      renderCell: (params) => (
+        <div>
+          <a>{params.row.referenceInventaire}</a>
+        </div>
+      ),
+    },
+    { field: "nomEntrepot", headerName: "ENTREPOT", width: 110 },
+    { field: "nomCasier", headerName: "CASIER", width: 130 },
+    { field: "nomProduit", headerName: "PRODUIT", width: 140 },
+    { field: "action", headerName: "ACTION", width: 110 },
+    { field: "stock_initia", headerName: "STOCK REEL", width: 110 },
+    { field: "stock_Encours1", headerName: "STOCK EN COURS", width: 130 },
+    { field: "stock_Encours2", headerName: "STOCK EN FINAL", width: 110 },
+    { field: "name", headerName: "UTILISATEUR", width: 110 },
+  ];
+  const listeProduitModifierInventaire = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(
+        "http://127.0.0.1:8000/api/listeProduitModifierInventaire"
+      );
+      // console.log("debut");
+      // console.log(response.data);
+      // console.log("fin");
+      setOriginelisteProduitModifierInventairetableau(response.data.data);
+      setlisteProduitModifierInventairetableau(response.data.data);
+    } catch (err) {
+      setError("Erreur lors du chargement de l'utilisateur.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const [
+    formDataSearcheTableauInventaire,
+    setformDataSearcheTableauInventaire,
+  ] = useState({
+    produit: "",
+    name: "",
+    date: "",
+    entrepot: "",
+    casier: "",
+    reference: "",
+  });
+
+  const handleChangeSearchetableauInventaire = (e) => {
+    const { name, value } = e.target;
+    setformDataSearcheTableauInventaire((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSearcheSubmittableInventaire = (e) => {
+    e.preventDefault();
+
+    const filtered = OriginelisteProduitModifierInventairetableau.filter(
+      (item) => {
+        const produit = item.nomProduit ? item.nomProduit.toLowerCase() : "";
+        const date = item.date ? item.date.toLowerCase() : "";
+        const entrepot = item.nomEntrepot ? item.nomEntrepot.toLowerCase() : "";
+        const casier = item.nomCasier ? item.nomCasier.toLowerCase() : "";
+        const reference = item.referenceInventaire
+          ? item.referenceInventaire.toLowerCase()
+          : "";
+        const name = item.name ? item.name.toLowerCase() : "";
+
+        return (
+          (formDataSearcheTableauInventaire.produit === "" ||
+            produit.includes(
+              formDataSearcheTableauInventaire.produit.toLowerCase()
+            )) &&
+          (formDataSearcheTableauInventaire.date === "" ||
+            date.includes(
+              formDataSearcheTableauInventaire.date.toLowerCase()
+            )) &&
+          (formDataSearcheTableauInventaire.entrepot === "" ||
+            entrepot.includes(
+              formDataSearcheTableauInventaire.entrepot.toLowerCase()
+            )) &&
+          (formDataSearcheTableauInventaire.casier === "" ||
+            casier.includes(
+              formDataSearcheTableauInventaire.casier.toLowerCase()
+            )) &&
+          (formDataSearcheTableauInventaire.reference === "" ||
+            reference.includes(
+              formDataSearcheTableauInventaire.reference.toLowerCase()
+            )) &&
+          (formDataSearcheTableauInventaire.name === "" ||
+            name.includes(formDataSearcheTableauInventaire.name.toLowerCase()))
+        );
+      }
+    );
+
+    setlisteProduitModifierInventairetableau(filtered);
+  };
+
+  const handleRefreshtableauInventaire = () => {
+    setformDataSearcheTableauInventaire({
+      produit: "",
+      name: "",
+      date: "",
+      entrepot: "",
+      casier: "",
+      reference: "",
+    });
+    setlisteProduitModifierInventairetableau(
+      OriginelisteProduitModifierInventairetableau
+    );
+  };
+
+  const ColunneHistoriqueStockENTREPOT_inventaire = [
+    { field: "date", headerName: "DATE", width: 100 },
+    { field: "nomEntrepotSource", headerName: "ENTREPOT SOURCE", width: 100 },
+    { field: "nomCasierSource", headerName: "CASIER SOURCE", width: 100 },
+    { field: "nomEntrepotFinal", headerName: "ENTREPOT FINAL", width: 100 },
+    { field: "nomCasierFinal", headerName: "CASIER FINAL", width: 100 },
+    { field: "nomProduit", headerName: "PRODUIT", width: 120 },
+    { field: "stock", headerName: " STOCK", width: 120 },
+    { field: "action", headerName: "ACTION", width: 120 },
+    { field: "nomUtilisateur", headerName: "UTILISATEUR", width: 120 },
+  ];
+
+  const listesHE_tout = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(
+        `http://127.0.0.1:8000/api/HistoriqueEntrepot_inventaire`
+      );
+      // console.log("debut debut");
+      // console.log(response.data);
+      // console.log("fin fin");
+      setOrigineListeHistoriqueStockENTREPOT(response.data);
+      setListeHistoriqueStockENTREPOT(response.data);
+    } catch (err) {
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleChangeSearchetableauInventaire_ = (e) => {
+    const { name, value } = e.target;
+    setformDataSearcheTableauInventaire((prev) => ({ ...prev, [name]: value }));
+  };
+
+  //   LISTE Casier
+  const [ListeC_inventaire, setListeC_inventaire] = useState([]);
+  const [OrigineListeC_inventaire, setOrigineListeC_inventaire] = useState([]);
+
+  const [errors, setErrors] = useState(null);
+
+  const ColunneC_inventaire = [
+    { field: "created_at", headerName: "DATE", width: 140 },
+    { field: "entrepot_nom", headerName: "ENTREPOT", width: 140 },
+    { field: "nom", headerName: "CASIER", width: 140 },
+    { field: "nomproduit", headerName: "PRODUIT", width: 140 }, // ton JSON ne l’a pas encore
+    { field: "stock_total", headerName: "STOCK", width: 140 },
+    { field: "action", headerName: "ACTION", width: 160 },
+    { field: "user_name", headerName: "UTILISATEUR", width: 154 },
+  ];
+
+  const liste_Casier_tout = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(
+        "http://127.0.0.1:8000/api/liste_Casier_tout"
+      );
+
+      // console.log("Réponse API:", response.data.data); // DEBUG
+
+      // const dataWithId = response.data.data.map((item, index) => ({
+      //   id: index + 1, // DataGrid exige un id unique
+      //   ...item,
+      // }));
+      const dataWithId = response.data.data.map((item) => ({
+        id: item.id, // <-- utilise l'id unique de ton backend
+        ...item,
+      }));
+      liste_Casier_tout();
+      setListeC_inventaire(dataWithId);
+      setOrigineListeC_inventaire(dataWithId);
+    } catch (err) {
+      console.error("Erreur API:", err);
+      setErrors("Erreur lors du chargement des casiers.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const [formDataSearcheTableau_casier, setformDataSearcheTableau_casier] =
+    useState({
+      produit: "",
+      utilisateur: "",
+      entrepot: "",
+      casier: "",
+      action: "",
+    });
+
+  const handleChangeSearchetableau_casier = (e) => {
+    const { name, value } = e.target;
+    setformDataSearcheTableau_casier((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSearcheSubmittable_casier = (e) => {
+    e.preventDefault();
+
+    const filtered = OrigineListeC_inventaire.filter((item) => {
+      const produit = item.nomproduit?.toLowerCase() || "";
+      const entrepot = item.entrepot_nom?.toLowerCase() || "";
+      const casier = item.nom?.toLowerCase() || "";
+      const utilisateur = item.user_name?.toLowerCase() || "";
+      const action = item.action?.toLowerCase() || "";
+
+      return (
+        (!formDataSearcheTableau_casier.produit ||
+          produit.includes(
+            formDataSearcheTableau_casier.produit.toLowerCase()
+          )) &&
+        (!formDataSearcheTableau_casier.utilisateur ||
+          utilisateur.includes(
+            formDataSearcheTableau_casier.utilisateur.toLowerCase()
+          )) &&
+        (!formDataSearcheTableau_casier.entrepot ||
+          entrepot.includes(
+            formDataSearcheTableau_casier.entrepot.toLowerCase()
+          )) &&
+        (!formDataSearcheTableau_casier.casier ||
+          casier.includes(
+            formDataSearcheTableau_casier.casier.toLowerCase()
+          )) &&
+        (!formDataSearcheTableau_casier.action ||
+          action.includes(formDataSearcheTableau_casier.action.toLowerCase()))
+      );
+    });
+
+    setListeC_inventaire(filtered);
+  };
+
+  const handleRefreshtableau_casier = () => {
+    setformDataSearcheTableau_casier({
+      produit: "",
+      utilisateur: "",
+      entrepot: "",
+      casier: "",
+      action: "",
+    });
+    // Remet la liste complète
+    setListeC_inventaire(OrigineListeC_inventaire);
+  };
+
+  ///stock transfert
+  // const [produit_nom_filtre, setproduit_nom_filtre] = useState([]);
+  const [produit_nom_filtre, setproduit_nom_filtre] = useState([]);
+  const [ORIGINE_produit_nom_filtre, set_ORIGINE_produit_nom_filtre] = useState(
+    []
+  );
+  const [formData_produit_select, setformData_produit_select] = useState({
+    produit: "",
+  });
+  const listeProduit = async () => {
+    try {
+      const response = await axios.get(
+        "http://127.0.0.1:8000/api/liste_Produit"
+      );
+      setproduit_nom_filtre(response.data);
+      set_ORIGINE_produit_nom_filtre(response.data);
+    } catch (err) {
+      setErrors("Erreur lors du chargement des produits.");
+    }
+  };
+
+  // useEffect(() => {
+  //   listeProduit();
+  // }, []);
+
+  const select_Produit = (e) => {
+    const { name, value } = e.target;
+    setformData_produit_select((prev) => ({ ...prev, [name]: value }));
+
+    // ⚡ déclenche la recherche automatique
+    handleSearcheSubmitan_select_produit(value);
+  };
+  // Rechercher
+  const [produitSelectionne, setProduitSelectionne] = useState(null); // ✅ un seul produit
+
+  const handleSearcheSubmitan_select_produit = (produit) => {
+    const filtered = ORIGINE_produit_nom_filtre.find(
+      (item) => item.nomProduit === produit
+    );
+    setProduitSelectionne(filtered); // ✅ met à jour directement le produit sélectionné
+  };
+
+  const [
+    formData_produit_insertion_stock_transfert,
+    setformData_produit_insertion_stock_transfert,
+  ] = useState({
+    idProduit: "",
+    stock_actuel: "",
+    entrepotSource: "",
+    casierSource: "",
+    stock_transferer: "",
+    entrepot_destinateur: "",
+    casier_destinateur: "",
+  });
+
+  // 🔥 Sync automatique avec produitSelectionne
   React.useEffect(() => {
+    if (produitSelectionne) {
+      setformData_produit_insertion_stock_transfert((prev) => ({
+        ...prev,
+        idProduit: produitSelectionne.id || "",
+        stock_actuel: produitSelectionne.stock_initia || "",
+        entrepotSource: produitSelectionne.idEntrepot || "",
+        casierSource: produitSelectionne.idCasier || "",
+        entrepotSourcenom: produitSelectionne.entrepot || "",
+        casierSourcenom: produitSelectionne.casier || "",
+      }));
+    }
+  }, [produitSelectionne]);
+
+  // Gestion des changements
+  const onChangeData_produit_insertion_stock_transfert = (e) => {
+    const { name, value } = e.target;
+    setformData_produit_insertion_stock_transfert((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const onSubmitData_produit_insertion_stock_transfert = async (e) => {
+    e.preventDefault();
+    setError("");
+    setSuccess(false);
+
+    try {
+      const data = new FormData();
+
+      for (const key in formData_produit_insertion_stock_transfert) {
+        data.append(key, formData_produit_insertion_stock_transfert[key]);
+      }
+
+      const response = await axios.post(
+        `http://127.0.0.1:8000/api/insertion_stock_transfert/${DonneSession.id}`,
+        data,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+
+      setformData_produit_insertion_stock_transfert({
+        idProduit: "",
+        stock_actuel: "",
+        entrepotSource: "",
+        casierSource: "",
+        stock_transferer: "",
+        entrepot_destinateur: "",
+        casier_destinateur: "",
+      });
+      listesHE_tout();
+      handleSelect("LISTE DE TRANSFERT", " ");
+      showMessage("success", response.data.message);
+    } catch (err) {
+      if (err.response) {
+        console.log(err.response.data);
+        showMessage("error", err.response.data.message);
+      } else {
+        console.log("Erreur inconnue :", err.message);
+        showMessage("error", "Une erreur est survenue");
+      }
+    }
+  };
+
+  const [tout_liste_casier, settout_liste_casier] = useState([]);
+  const [tout_liste_entrepot, settout_liste_entrepot] = useState([]);
+  const tout_liste = async () => {
+    try {
+      const response = await axios.get("http://127.0.0.1:8000/api/tout_liste");
+      settout_liste_entrepot(response.data.entrepot_liste);
+      settout_liste_casier(response.data.casier_liste);
+    } catch (err) {
+      setErrors("Erreur lors du chargement des entrepôts et casiers.");
+    }
+  };
+
+  React.useEffect(() => {
+    tout_liste();
+    listeProduit();
+    listeC();
+    liste_Casier_tout();
     ajouterCasier();
     listemHistoriqueTransfert();
+    listeProduitModifierInventaire();
     listems();
     listemsE();
-    listeC();
+    listesHE_tout();
     listesHE();
     handleSelect("ListeEntrepot", "ENTREPOT");
   }, []);
@@ -1170,6 +1695,25 @@ export function Entrepot() {
                   className="block cursor-pointer text-gray-600 text-sm py-1 px-2 rounded hover:bg-blue-400 hover:text-white transition"
                 >
                   LISTE ENTREPOT
+                </a>
+                <a
+                  onClick={() => {
+                    handleSelectType("TRANSFERT DE STOCK");
+                    handleSelect("STOCK", "STOCK");
+                  }}
+                  className="block cursor-pointer text-gray-600 text-sm py-1 px-2 rounded hover:bg-blue-400 hover:text-white transition"
+                >
+                  TRANSFERT DE STOCK
+                </a>
+                <a
+                  onClick={() => {
+                    // handleSelectType("STOCK");
+                    listesHE_tout();
+                    handleSelect("LISTE DE TRANSFERT", " ");
+                  }}
+                  className="block cursor-pointer text-gray-600 text-sm py-1 px-2 rounded hover:bg-blue-400 hover:text-white transition"
+                >
+                  LISTE DE TRANSFERT
                 </a>
               </div>
             )}
@@ -1293,6 +1837,7 @@ export function Entrepot() {
                       : ""
                   }`}
                   onClick={() => {
+                    listesHE_tout();
                     handleSelectType("entrepotcree");
                     handleSelect("INVENTAIRE entrepot", "INVENTAIRE entrepot");
                   }}
@@ -1308,6 +1853,44 @@ export function Entrepot() {
                     handleSelect("InsertionEntrepot", "ENTREPOT");
                   }}
                 ></button>
+              </div>
+            ) : activationAffichagetype === "TRANSFERT DE STOCK" ? (
+              <div>
+                <button
+                  className={`hover:border-b-blue-500 border border-gray-200 text-blue-500 py-1 px-10 ${
+                    condition_navbar === "PRODUIT" ? "border-b-blue-500" : ""
+                  }`}
+                  onClick={() => {}}
+                >
+                  PRODUIT
+                </button>
+
+                <button
+                  className={`hover:border-b-blue-500 border border-gray-200 text-blue-500 py-1 px-10 ${
+                    condition_navbar === "PRIX" ? "border-b-blue-500" : ""
+                  }`}
+                >
+                  PRIX
+                </button>
+
+                <button
+                  className={`hover:border-b-blue-500 border border-gray-200 text-blue-500 py-1 px-10 ${
+                    condition_navbar === "STOCK" ? "border-b-blue-500" : ""
+                  }`}
+                  onClick={() => {
+                    handleSelectType("STOCK");
+                    handleSelect("TRANSFERT DE STOCK", "STOCK");
+                  }}
+                >
+                  STOCK
+                </button>
+                <button
+                  className={`hover:border-b-blue-500 border border-gray-200 text-blue-500 py-1 px-10 ${
+                    condition_navbar === "DOCUMENTS" ? "border-b-blue-500" : ""
+                  }`}
+                >
+                  DOCUMENTS
+                </button>
               </div>
             ) : (
               <div>
@@ -1339,27 +1922,384 @@ export function Entrepot() {
                       "HISTORIQUE DE TRANSFERT"
                     );
                   }}
-                >
-                  HISTORIQUE DE TRANSFERT
-                </button>
+                ></button>
               </div>
             )}
           </div>
+
+          {ActivationAffichage === "STOCK" && (
+            <div className="bg-white p-8 rounded-xl shadow-md  justify-center">
+              <form
+                onSubmit={handleSearcheSubmitan_select_produit}
+                method="post"
+              >
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                  <div></div>
+                  <div className="flex flex-col">
+                    <label className="font-semibold text-gray-700 text-sm md:text-base mb-2">
+                      PRODUIT
+                    </label>
+                    <select
+                      name="produit"
+                      value={formData_produit_select.produit}
+                      onChange={select_Produit}
+                      required
+                      className="w-full md:w-[40vh] px-4 py-3 border border-gray-300 rounded-lg text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="">...</option>
+                      {[
+                        ...new Set(
+                          produit_nom_filtre.map((item) => item.nomProduit)
+                        ),
+                      ].map((nomProduit, index) => (
+                        <option key={index} value={nomProduit}>
+                          {nomProduit}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div></div>
+                </div>
+              </form>
+              <form
+                onSubmit={onSubmitData_produit_insertion_stock_transfert}
+                className="w-full max-w-5xl"
+              >
+                {/* Ligne 1 : PRODUIT */}
+                <input
+                  type="hidden"
+                  name="idProduit"
+                  value={formData_produit_insertion_stock_transfert.idProduit}
+                />
+
+                {/* Ligne 2 */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                  <div className="flex flex-col">
+                    <label className="font-semibold text-gray-700 text-sm md:text-base mb-2">
+                      STOCK ACTUEL
+                    </label>
+                    <input
+                      type="text"
+                      name="stock_actuel"
+                      disabled
+                      onChange={onChangeData_produit_insertion_stock_transfert}
+                      value={
+                        formData_produit_insertion_stock_transfert.stock_actuel
+                      }
+                      className="w-full md:w-[40vh] px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+
+                  <div className="flex flex-col">
+                    <label className="font-semibold text-gray-700 text-sm md:text-base mb-2">
+                      ENTREPÔT SOURCE
+                    </label>
+                    <input
+                      disabled
+                      name="entrepotSourcenom"
+                      value={
+                        formData_produit_insertion_stock_transfert.entrepotSourcenom
+                      }
+                      type="text"
+                      className="w-full md:w-[40vh] px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <input
+                      disabled
+                      name="entrepotSource"
+                      onChange={onChangeData_produit_insertion_stock_transfert}
+                      value={
+                        formData_produit_insertion_stock_transfert.entrepotSource
+                      }
+                      type="hidden"
+                      className="w-full md:w-[40vh] px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+
+                  <div className="flex flex-col">
+                    <label className="font-semibold text-gray-700 text-sm md:text-base mb-2">
+                      CASIER
+                    </label>
+                    <input
+                      disabled
+                      name="casierSourcenom"
+                      value={
+                        formData_produit_insertion_stock_transfert.casierSourcenom
+                      }
+                      type="text"
+                      className="w-full md:w-[40vh] px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <input
+                      disabled
+                      name="casierSource"
+                      onChange={onChangeData_produit_insertion_stock_transfert}
+                      value={
+                        formData_produit_insertion_stock_transfert.casierSource
+                      }
+                      type="hidden"
+                      className="w-full md:w-[40vh] px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+
+                {/* Ligne 3 */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                  <div className="flex flex-col">
+                    <label className="font-semibold text-gray-700 text-sm md:text-base mb-2">
+                      STOCK À TRANSFÉRER
+                    </label>
+                    <input
+                      onChange={onChangeData_produit_insertion_stock_transfert}
+                      value={
+                        formData_produit_insertion_stock_transfert.stock_transferer
+                      }
+                      name="stock_transferer"
+                      type="number"
+                      className="w-full md:w-[40vh] px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+
+                  <div className="flex flex-col">
+                    <label className="font-semibold text-gray-700 text-sm md:text-base mb-2">
+                      ENTREPOT DESTINATAIRE
+                    </label>
+                    <select
+                      onChange={onChangeData_produit_insertion_stock_transfert}
+                      value={
+                        formData_produit_insertion_stock_transfert.entrepot_destinateur
+                      }
+                      name="entrepot_destinateur"
+                      className="w-full md:w-[40vh] px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="">...</option>
+                      {tout_liste_entrepot.map((entrepot) => (
+                        <option key={entrepot.id} value={entrepot.id}>
+                          {entrepot.nom}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="flex flex-col">
+                    <label className="font-semibold text-gray-700 text-sm md:text-base mb-2">
+                      CASIER
+                    </label>
+                    <select
+                      onChange={onChangeData_produit_insertion_stock_transfert}
+                      name="casier_destinateur"
+                      value={
+                        formData_produit_insertion_stock_transfert.casier_destinateur
+                      }
+                      className="w-full md:w-[40vh] px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="">...</option>
+                      {tout_liste_casier.map((item) => (
+                        <option key={item.id} value={item.id}>
+                          {item.nom}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Bouton */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                  <div></div>
+                  <div className="flex flex-col">
+                    <button className="w-full md:w-[40vh] bg-blue-500 hover:bg-blue-600 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                      ENREGISTRER
+                    </button>
+                  </div>
+                  <div></div>
+                </div>
+              </form>
+            </div>
+          )}
+
+          {ActivationAffichage === "LISTE DE TRANSFERT" && (
+            <div className="bg-white shadow-md rounded-2xl p-6 mb-6">
+              <div className="flex items-center justify-between">
+                {/* Titre à gauche */}
+                <h1 className="text-xl font-bold text-gray-800"></h1>
+                {/* Formulaire à droite */}
+                <form
+                  className="grid grid-cols-6 gap-4 items-end"
+                  onSubmit={handleSearcheSubmitHistoriqueENTREPOT}
+                >
+                  <div>
+                    <label className="font-semibold text-gray-700">
+                      PRODUIT
+                    </label>
+                    <select
+                      name="produit"
+                      value={formDataSearcheHistoriqueENTREPOT.produit}
+                      onChange={handleChangeSearcheHistoriqueENTREPOT}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value=""> </option>
+                      {[
+                        ...new Set(
+                          OrigineListeHistoriqueStockENTREPOT.map(
+                            (item) => item.nomProduit
+                          )
+                        ),
+                      ].map((nomProduit, index) => (
+                        <option key={index} value={nomProduit}>
+                          {nomProduit}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="font-semibold text-gray-700">
+                      ENTREPOT
+                    </label>
+                    <select
+                      name="entrepot"
+                      value={formDataSearcheHistoriqueENTREPOT.entrepot}
+                      onChange={handleChangeSearcheHistoriqueENTREPOT}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value=""> </option>
+                      {[
+                        ...new Set(
+                          OrigineListeHistoriqueStockENTREPOT.map(
+                            (item) => item.nomEntrepotFinal
+                          )
+                        ),
+                      ].map((nomEntrepotFinal, index) => (
+                        <option key={index} value={nomEntrepotFinal}>
+                          {nomEntrepotFinal}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  {/* casier */}
+                  <div>
+                    <label className="font-semibold text-gray-700">
+                      CASIER
+                    </label>
+                    <select
+                      name="casier"
+                      value={formDataSearcheHistoriqueENTREPOT.casier}
+                      onChange={handleChangeSearcheHistoriqueENTREPOT}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value=""> </option>
+                      {[
+                        ...new Set(
+                          OrigineListeHistoriqueStockENTREPOT.map(
+                            (item) => item.nomCasierFinal
+                          )
+                        ),
+                      ].map((nomCasierFinal, index) => (
+                        <option key={index} value={nomCasierFinal}>
+                          {nomCasierFinal}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* DATE */}
+                  <div>
+                    <label className="font-semibold text-gray-700">DATE</label>
+                    <input
+                      type="date"
+                      name="date"
+                      value={formDataSearcheHistoriqueENTREPOT.date}
+                      onChange={handleChangeSearcheHistoriqueENTREPOT}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="font-semibold text-gray-700">
+                      UTILISATEUR
+                    </label>
+                    <select
+                      name="utilisateur"
+                      value={formDataSearcheHistoriqueENTREPOT.utilisateur}
+                      onChange={handleChangeSearcheHistoriqueENTREPOT}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value=""> </option>
+                      {[
+                        ...new Set(
+                          OrigineListeHistoriqueStockENTREPOT.map(
+                            (item) => item.nomUtilisateur
+                          )
+                        ),
+                      ].map((nomUtilisateur, index) => (
+                        <option key={index} value={nomUtilisateur}>
+                          {nomUtilisateur}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* FILTRER */}
+                  <div className="flex flex-col">
+                    <label className="text-white">-</label>
+                    <button
+                      type="submit"
+                      className="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600 transition"
+                    >
+                      FILTRER
+                    </button>
+                  </div>
+
+                  {/* RAFRAICHIR */}
+                  <div className="flex flex-col">
+                    <label className="text-white">-</label>
+                    <button
+                      type="button"
+                      onClick={resetSearchehistorique}
+                      className="bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition"
+                    >
+                      RAFRAICHIR
+                    </button>
+                  </div>
+                </form>
+              </div>
+              <div>
+                {message && (
+                  <div
+                    className={` right-4 bg-green-300 text-white pt-6 pb-6 px-[20%] text-center m-8 rounded text-lg shadow-md
+      ${message?.type === "success" ? "bg-green-500 text-white" : ""}
+      ${message?.type === "error" ? "bg-red-500 text-white" : ""}
+      ${message?.type === "warning" ? "bg-orange-500 text-white" : ""}`}
+                  >
+                    {message?.text}
+                  </div>
+                )}
+              </div>
+              <Box sx={{ height: "55vh", width: "160vh" }}>
+                <DataGrid
+                  rows={ListeHistoriqueStockENTREPOT}
+                  columns={ColunneHistoriqueStockENTREPOT}
+                  pageSize={5}
+                  rowsPerPageOptions={[5, 10]}
+                  loading={loading}
+                  sx={{
+                    "& .MuiDataGrid-columnHeaders": {
+                      backgroundColor: "#3B82F6", // bleu
+                    },
+                    "& .MuiDataGrid-columnHeaderTitle": {
+                      color: "#fff", // texte blanc
+                      fontWeight: "bold",
+                    },
+                    "& .MuiDataGrid-columnHeader": {
+                      backgroundColor: "#3B82F6", // pour chaque cellule d’en-tête
+                      color: "#fff",
+                    },
+                  }}
+                />
+              </Box>
+            </div>
+          )}
           {ActivationAffichage === "INVENTAIRE entrepot" && (
             <div>
               <div>
                 {invetaireSelectionTypeAffichage === "creation" ? (
-                  <div>
-                    <button
-                      onClick={() =>
-                        setinvetaireSelectionTypeAffichage("liste")
-                      }
-                      className="w-full sm:w-auto bg-green-500 text-white py-2 px-6 rounded-md hover:bg-green-600 transition"
-                    >
-                      CREATION
-                    </button>
-                  </div>
-                ) : invetaireSelectionTypeAffichage === "liste" ? (
                   <div>
                     <div className="bg-white p-6 rounded-lg shadow-md">
                       <form
@@ -1367,8 +2307,6 @@ export function Entrepot() {
                         onSubmit={insertionInventaireEntrepot}
                       >
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          {/* Entrepôt */}
-                          {/* ENTREPOT */}
                           <select
                             name="entrepot"
                             required
@@ -1464,7 +2402,7 @@ export function Entrepot() {
                           <button
                             type="button"
                             onClick={() =>
-                              setInventaireSelectionTypeAffichage("creation")
+                              setinvetaireSelectionTypeAffichage("liste")
                             }
                             className="w-full sm:w-auto bg-red-500 text-white py-2 px-6 rounded-md hover:bg-red-600 transition"
                           >
@@ -1473,6 +2411,220 @@ export function Entrepot() {
                         </div>
                       </form>
                     </div>
+                  </div>
+                ) : invetaireSelectionTypeAffichage === "liste" ? (
+                  <div className="bg-white shadow-md rounded-2xl p-6 mb-6">
+                    <div className="flex  items-center justify-end ">
+                      <form
+                        onSubmit={handleSearcheSubmittableInventaire}
+                        className="grid grid-cols-9 gap-4 items-center"
+                      >
+                        {/* ENTREPOT */}
+                        <div>
+                          <label
+                            htmlFor="entrepot"
+                            className="font-semibold text-gray-700"
+                          >
+                            ENTREPOTS
+                          </label>
+                          <select
+                            id="entrepot"
+                            value={formDataSearcheTableauInventaire.entrepot}
+                            onChange={handleChangeSearchetableauInventaire}
+                            name="entrepot"
+                            className="w-[100%] px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          >
+                            <option value=""></option>
+                            {[
+                              ...new Set(
+                                OriginelisteProduitModifierInventairetableau.map(
+                                  (item) => item.nomEntrepot
+                                )
+                              ),
+                            ].map((nomEntrepot, index) => (
+                              <option
+                                key={`nomEntrepot-${index}`}
+                                value={nomEntrepot}
+                              >
+                                {nomEntrepot}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        {/* CASIER */}
+                        <div>
+                          <label
+                            htmlFor="casier"
+                            className="font-semibold text-gray-700"
+                          >
+                            CASIERS
+                          </label>
+                          <select
+                            id="casier"
+                            value={formDataSearcheTableauInventaire.casier}
+                            onChange={handleChangeSearchetableauInventaire}
+                            name="casier"
+                            className="w-[100%] px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          >
+                            <option value=""></option>
+                            {[
+                              ...new Set(
+                                OriginelisteProduitModifierInventairetableau.map(
+                                  (item) => item.nomCasier
+                                )
+                              ),
+                            ].map((nomCasier, index) => (
+                              <option
+                                key={`nomCasier-${index}`}
+                                value={nomCasier}
+                              >
+                                {nomCasier}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        {/* PRODUIT */}
+                        <div>
+                          <label
+                            htmlFor="produit"
+                            className="font-semibold text-gray-700"
+                          >
+                            PRODUITS
+                          </label>
+                          <select
+                            id="produit"
+                            value={formDataSearcheTableauInventaire.produit}
+                            onChange={handleChangeSearchetableauInventaire}
+                            name="produit"
+                            className="w-[100%] px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          >
+                            <option value=""></option>
+                            {[
+                              ...new Set(
+                                OriginelisteProduitModifierInventairetableau.map(
+                                  (item) => item.nomProduit
+                                )
+                              ),
+                            ].map((nomProduit, index) => (
+                              <option
+                                key={`nomProduit-${index}`}
+                                value={nomProduit}
+                              >
+                                {nomProduit}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        {/* ZONE */}
+                        <div>
+                          <label
+                            htmlFor="zone"
+                            className="font-semibold text-gray-700"
+                          >
+                            DATE
+                          </label>
+                          <input
+                            type="date"
+                            id="date"
+                            value={formDataSearcheTableauInventaire.date}
+                            onChange={handleChangeSearchetableauInventaire}
+                            name="date"
+                            className="w-[100%] px-3 py-2 border border-gray-300 rounded-lg"
+                          />
+                        </div>
+
+                        {/* reference */}
+                        <div>
+                          <label
+                            htmlFor="reference"
+                            className="font-semibold text-gray-700"
+                          >
+                            REFERENCE
+                          </label>
+                          <input
+                            type="text"
+                            value={formDataSearcheTableauInventaire.reference}
+                            onChange={handleChangeSearchetableauInventaire}
+                            id="reference"
+                            name="reference"
+                            className="w-[100%] px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+
+                        {/* UTILISATEUR */}
+                        <div>
+                          <label
+                            htmlFor="name"
+                            className="font-semibold text-gray-700"
+                          >
+                            UTILISATEUR
+                          </label>
+                          <input
+                            type="text"
+                            value={formDataSearcheTableauInventaire.name}
+                            onChange={handleChangeSearchetableauInventaire}
+                            id="name"
+                            name="name"
+                            className="w-[100%] px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+                        {/* BOUTONS */}
+                        <div>
+                          <label className="font-semibold text-white">K</label>
+                          <button
+                            type="submit"
+                            className="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600 transition"
+                          >
+                            FILTRER
+                          </button>
+                        </div>
+                        <div>
+                          <label className="font-semibold text-white">K</label>
+                          <button
+                            onClick={handleRefreshtableauInventaire}
+                            type="button"
+                            className=" bg-gray-500 text-white py-2 px-2 rounded-lg hover:bg-gray-600 transition"
+                          >
+                            RAFRAICHIR
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                    {message && (
+                      <div
+                        className={` right-4 bg-green-300 text-white pt-6 pb-6 px-[20%] text-center m-8 rounded shadow-md
+      ${message.type === "success" ? "bg-green-500 text-white" : ""}
+      ${message.type === "error" ? "bg-red-500 text-white" : ""}
+      ${message.type === "warning" ? "bg-orange-500 text-white" : ""}`}
+                      >
+                        {message.text}
+                      </div>
+                    )}
+                    <Box sx={{ height: "55vh" }}>
+                      <DataGrid
+                        rows={listeProduitModifierInventairetableau}
+                        columns={ColunneProduitModifier}
+                        getRowId={(row) => row.idInventaire} // 👈 changer ici
+                        pageSize={5}
+                        rowsPerPageOptions={[5, 10]}
+                        loading={loading}
+                        sx={{
+                          "& .MuiDataGrid-columnHeaders": {
+                            backgroundColor: "#3B82F6",
+                          },
+                          "& .MuiDataGrid-columnHeaderTitle": {
+                            color: "#fff",
+                            fontWeight: "bold",
+                          },
+                          "& .MuiDataGrid-columnHeader": {
+                            backgroundColor: "#3B82F6",
+                            color: "#fff",
+                          },
+                        }}
+                      />
+                    </Box>
                   </div>
                 ) : (
                   <div className="flex flex-cols">
@@ -1512,29 +2664,6 @@ export function Entrepot() {
                   </div>
                 )}
               </div>
-              {/* <Box sx={{ height: "58vh" }}>
-                <DataGrid
-                  rows={liste_inventaire_tableau}
-                  columns={Colonetableauinvetairecree}
-                  pageSize={5}
-                  rowsPerPageOptions={[5, 10]}
-                  loading={loading}
-                  sx={{
-                    "& .MuiDataGrid-columnHeaders": {
-                      backgroundColor: "#3B82F6",
-                    },
-                    "& .MuiDataGrid-columnHeaderTitle": {
-                      color: "#fff",
-                      fontWeight: "bold",
-                    },
-                    "& .MuiDataGrid-columnHeader": {
-                      backgroundColor: "#3B82F6",
-                      color: "#fff",
-                    },
-                  }}
-                />
-              </Box> */}
-
               <table className="w-full border border-gray-300">
                 <thead>
                   <tr className="bg-gray-200">
@@ -1621,7 +2750,6 @@ export function Entrepot() {
               <div className="flex items-center justify-between">
                 {/* Titre à gauche */}
                 <h1 className="text-xl font-bold text-gray-800"></h1>
-
                 {/* Formulaire à droite */}
                 <form
                   className="grid grid-cols-6 gap-4 items-end"
@@ -2109,6 +3237,19 @@ export function Entrepot() {
                     ? "DESACTIVER"
                     : "ACTIVER"}
                 </button>
+                {/* <button
+                  onClick={() =>
+                    donneEntrepotCreer.id &&
+                    etat_entrepot(
+                      donneEntrepotCreer.id,
+                      donneEntrepotCreer.etat
+                    )
+                  }
+                >
+                  {donneEntrepotCreer.etat === "activer"
+                    ? "DESACTIVER"
+                    : "ACTIVER"}
+                </button> */}
 
                 <button
                   type="button"
@@ -2138,7 +3279,6 @@ export function Entrepot() {
                     {message?.text}
                   </div>
                 )}
-
                 <br />
                 <br />
                 {/* Grid principale : 2 champs par ligne */}
@@ -2458,7 +3598,7 @@ export function Entrepot() {
                   </button>
                 </div>
 
-                {error && <p className="text-red-600 text-center">{error}</p>}
+                {/* {error && <p className="text-red-600 text-center">{error}</p>} */}
                 {/* {success && (
                   <p className="text-green-600 text-center">
                     Produit inséré avec succès ✅
@@ -2756,83 +3896,93 @@ export function Entrepot() {
           )}
           {(ActivationAffichage === "CASIER" ||
             ActivationAffichage === "Listecasier") && (
-            <div className="bg-white shadow-md rounded-2xl p-6 mb-6">
-              <div className="flex items-center justify-between  ">
-                {/* Titre à gauche */}
-                <h1 className="text-xl font-bold text-gray-800"></h1>
-
-                {/* Formulaire à droite */}
+            <div className="bg-white shadow-md rounded-2xl p-6 mb-6 w-[166vh]">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 item-end">
                 <form
-                  // onSubmit={handleSearcheSubmit}
+                  onSubmit={handleSearcheSubmittable_casier}
                   className="flex gap-4 items-center"
                 >
-                  {/* Zone */}
                   <div>
                     <label
-                      htmlFor="zone"
+                      htmlFor="entrepot"
                       className="font-semibold text-gray-700 text-sm block"
                     >
-                      ZONE
+                      ENTREPOT
                     </label>
                     <input
-                      name="zone"
+                      name="entrepot"
+                      htmlFor="entrepot"
+                      value={formDataSearcheTableau_casier.entrepot}
+                      onChange={handleChangeSearchetableau_casier}
                       type="text"
-                      className=" px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className=" w-[20vh] px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
                   <div>
                     <label
-                      htmlFor="zone"
+                      htmlFor="CASIER"
                       className="font-semibold text-gray-700 text-sm block"
                     >
-                      ZONE
+                      CASIER
                     </label>
                     <input
-                      name="zone"
+                      name="casier"
+                      value={formDataSearcheTableau_casier.casier}
+                      onChange={handleChangeSearchetableau_casier}
                       type="text"
-                      className=" px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className=" w-[20vh] px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                   <div>
                     <label
-                      htmlFor="zone"
+                      htmlFor="produit"
                       className="font-semibold text-gray-700 text-sm block"
                     >
-                      ZONE
+                      PRODUITS
                     </label>
                     <input
-                      name="zone"
+                      name="produit"
+                      value={formDataSearcheTableau_casier.produit}
+                      onChange={handleChangeSearchetableau_casier}
                       type="text"
-                      className=" px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className=" w-[20vh] px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
-                  {/* Catégorie */}
                   <div>
                     <label
-                      htmlFor="categorie"
+                      htmlFor="utilisateur"
                       className="font-semibold text-gray-700 text-sm block"
                     >
-                      CATÉGORIE
+                      UTILISATEUR
                     </label>
-                    <select
-                      id="categorie"
-                      name="categorie"
-                      className=" px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      <option value="">-- Choisir --</option>
-                      {[
-                        ...new Set(OriginalListe.map((item) => item.categorie)),
-                      ].map((categorie, index) => (
-                        <option key={`categorie-${index}`} value={categorie}>
-                          {categorie}
-                        </option>
-                      ))}
-                    </select>
+
+                    <input
+                      name="utilisateur"
+                      value={formDataSearcheTableau_casier.utilisateur}
+                      onChange={handleChangeSearchetableau_casier}
+                      type="text"
+                      className=" w-[20vh] px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
                   </div>
 
-                  {/* Boutons */}
+                  <div>
+                    <label
+                      htmlFor="utilisateur"
+                      className="font-semibold text-gray-700 text-sm block"
+                    >
+                      ACTION
+                    </label>
+                    <input
+                      name="action"
+                      value={formDataSearcheTableau_casier.action}
+                      onChange={handleChangeSearchetableau_casier}
+                      type="text"
+                      className=" w-[20vh] px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+
                   <div className="flex gap-2 mt-5">
                     <button
                       type="submit"
@@ -2842,7 +3992,7 @@ export function Entrepot() {
                     </button>
                     <button
                       type="button"
-                      // onClick={handleRefresh}
+                      onClick={handleRefreshtableau_casier}
                       className="bg-gray-500 text-white py-2 px-4 rounded-lg shadow hover:bg-gray-600 transition"
                     >
                       RAFRAÎCHIR
@@ -2865,8 +4015,8 @@ export function Entrepot() {
               </div>
               <Box sx={{ height: "58vh" }}>
                 <DataGrid
-                  rows={ListeC}
-                  columns={ColunneC}
+                  rows={ListeC_inventaire}
+                  columns={ColunneC_inventaire}
                   pageSize={5}
                   rowsPerPageOptions={[5, 10]}
                   loading={loading}

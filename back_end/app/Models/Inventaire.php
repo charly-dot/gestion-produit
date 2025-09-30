@@ -15,6 +15,7 @@ class Inventaire extends Model
         'idCasier',
         'idProduit',
         'dateCreation',
+        'action',
         'reference',
         'colone1',
         'colone2',

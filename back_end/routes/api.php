@@ -23,10 +23,109 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
+Route::get('/tout_liste', function () {
+    $Casier = Casier::all();
+    $Entrepot = Entrepot::all();
+    return response()->json([
+        'casier_liste'   => $Casier,
+        'entrepot_liste' => $Entrepot
+    ]);
+});
+
+
 /// 3em projet parti 2 stock
 /// 3em projet parti 2 stock
 /// 3em projet parti 2 stock
 
+
+///transfert de stock
+Route::post('/insertion_stock_transfert/{id}', function (Request $request, $id) {
+    $nouvelStock = (int)$request->stock_actuel - (int)$request->stock_transferer;
+
+    $produit = Produit::findOrFail($request->idProduit); // ✅ correction
+    $produit->stock_initia = $nouvelStock; // ⚠️ adapte le nom de colonne si besoin
+    $produit->save();
+
+    $nouveauInventaire = Historiquetransferstock::create([
+        'entrepotSource'   => $request->entrepotSource,
+        'entrepotFinal'    => $request->entrepot_destinateur,
+        'casierSource'     => $request->casierSource,
+        'casierFinal'      => $request->casier_destinateur,
+        'produit'          => $request->idProduit,
+        'stock'            => $request->stock_transferer,
+        'date'             => now(),
+        'action' => "transfert de stock",
+        'colone5'          => $id,
+    ]);
+
+    return response()->json([
+        'message' => 'Inventaire bien sauvegardé',
+        'data'    => $nouveauInventaire,
+    ], 201);
+});
+
+
+/// MOUVEMENT DE STOCK
+Route::get('/MouvementStockEntrepot_inventaire', function () {
+    $results = DB::table('mouvementstocks as m')
+        ->join('users as u', 'm.colone5', '=', 'u.id')
+        ->join('entrepots as e', 'm.entrepot', '=', 'e.id')
+        ->join('casiers as c', 'm.casier', '=', 'c.id')
+        ->join('produits as p', 'm.produit', '=', 'p.id')
+        ->join('stocks as s', 's.id', '=', DB::raw('p."idStockage"'))
+        ->select(
+            'm.id as mouvement_id',
+            'm.*',
+            'e.id as entrepot_id',
+            'e.nom as entrepot_nom',
+            'c.id as casier_id',
+            'c.nom as casier_nom',
+            's.id as stock_id',
+            's.nom as stock_nom',
+            DB::raw('SUM(p.stock_initia) as total_stock')
+        )
+        ->groupBy(
+            'm.id',
+            'm.colone5',
+            'm.entrepot',
+            'm.casier',
+            'm.produit',
+            'e.id',
+            'e.nom',
+            'c.id',
+            'c.nom',
+            's.id',
+            's.nom'
+        )
+        ->orderBy('e.nom')
+        ->orderBy('c.nom')
+        ->orderBy('s.nom')
+        ->get();
+
+    return response()->json($results);
+});
+///HISTORIQUE DE TRANSFERT
+Route::get('/HistoriqueEntrepot_inventaire', function () {
+    $result = DB::table('historiquetransferstocks as h')
+        ->join('users as u', 'h.colone5', '=', 'u.id')
+        ->join('produits as p', 'h.produit', '=', 'p.id')
+        ->leftJoin('entrepots as es', 'h.entrepotSource', '=', 'es.id')
+        ->leftJoin('entrepots as ef', 'h.entrepotFinal', '=', 'ef.id')
+        ->leftJoin('casiers as cs', 'h.casierSource', '=', 'cs.id')
+        ->leftJoin('casiers as cf', 'h.casierFinal', '=', 'cf.id')
+        ->select(
+            'ef.zone',
+            DB::raw('es.nom as "nomEntrepotSource"'),
+            DB::raw('ef.nom as "nomEntrepotFinal"'),
+            DB::raw('cs.nom as "nomCasierSource"'),
+            DB::raw('cf.nom as "nomCasierFinal"'),
+            DB::raw('u.name as "nomUtilisateur"'),
+            DB::raw('p."nomProduit"'),
+            'h.*'
+        )
+        ->get();
+    return response()->json($result);
+});
 /// ENTREPOT partie 2 INVENTAIRE
 Route::put('/modifier_PRODUIT_inventaire/{id}', function (Request $request, $id) {
 
@@ -86,8 +185,6 @@ Route::put('/modifier_PRODUIT_inventaire/{id}', function (Request $request, $id)
         ], 500);
     }
 });
-
-
 Route::put('/changer_activation_PRODUIT_inventaire/{id}', function ($id, Request $request) {
     $produit = Produit::find($id);
 
@@ -136,7 +233,8 @@ Route::get('/listeProduitModifierInventaire', function (Request $request) {
             'c.nom as nomCasier',
             'c.id as idCasier',
             'i.id as idInventaire',
-            'i.reference as referenceInventaire'
+            'i.reference as referenceInventaire',
+            'i.action as action'
         )
         ->get();
 
@@ -419,10 +517,6 @@ Route::put('/modificationValeurStockInventaire2/{id}/{id2}/{nomProduit}', functi
         'data'           => $resultat,
     ], 201);
 });
-
-
-
-
 Route::post('/insertion_inventaire_produit/{id}', function (Request $request, $id) {
     $nouveauInventaire = Inventaire::create([
         'idEntrepot'     => $request->entrepot,
@@ -528,7 +622,7 @@ Route::post('/insertion_inventaire_produit/{id}', function (Request $request, $i
 
 ///ENTREPOT
 Route::get('/HistoriqueEntrepot/{id}', function ($id) {
-    $id = 2;
+    $id = 4;
 
     $Mouvementstock = DB::table('historiquetransferstocks as h')
         ->join('users as u', 'h.colone5', '=', 'u.id')
@@ -552,9 +646,8 @@ Route::get('/HistoriqueEntrepot/{id}', function ($id) {
         ->get();
     return response()->json($Mouvementstock);
 });
-
 Route::get('/HistoriqueEntrepot/{id}', function ($id) {
-    $id = 2;
+    $id = 4;
 
     $Mouvementstock = DB::table('historiquetransferstocks as h')
         ->join('users as u', 'h.colone5', '=', 'u.id')
@@ -579,31 +672,6 @@ Route::get('/HistoriqueEntrepot/{id}', function ($id) {
     return response()->json($Mouvementstock);
 });
 
-// Route::get('/HistoriqueEntrepot/{id}', function ($id) {
-
-//     $id = 1;
-//     $Mouvementstock = DB::table('historiquetransferstocks as h')
-//         ->join('users as u', 'h.colone5', '=', 'u.id')
-//         ->join('produits as p', 'h.produit', '=', 'p.id')
-//         ->leftJoin('entrepots as es', 'h.entrepotSource', '=', 'es.id')
-//         ->leftJoin('entrepots as ef', 'h.entrepotFinal', '=', 'ef.id')
-//         ->leftJoin('casiers as cs', 'h.casierSource', '=', 'cs.id')
-//         ->leftJoin('casiers as cf', 'h.casierFinal', '=', 'cf.id')
-//         ->where('h.casierFinal', $id)
-//         ->select(
-//             'es.nom as nomEntrepotSource',
-//             'ef.nom as nomEntrepotFinal',
-//             'cs.nom as nomCasierSource',
-//             'cf.nom as nomCasierFinal',
-//             'u.name as nomUtilisateur',
-//             'p.nomProduit',
-//             'h.*'
-//         )
-//         ->get();
-
-
-//     return response()->json($Mouvementstock);
-// });
 Route::get('/MouvementStockEntrepot/{id}', function ($id) {
 
     $id = 2;
@@ -626,7 +694,6 @@ Route::get('/MouvementStockEntrepot/{id}', function ($id) {
 
     return response()->json($Mouvementstock);
 });
-
 
 Route::post('/creationEntrepot/{id}', function (Request $request, $id) {
 
@@ -698,69 +765,7 @@ Route::post('/creationEntrepot/{id}', function (Request $request, $id) {
     }
 });
 
-
-
-// Route::post('/creationEntrepot/{id}', function (Request $request, $id) {
-//         $entrepot = Entrepot::create([
-//             'nom'      => $request->nom,
-//             'etat'     => $request->etat,
-//             'zone'     => $request->zone,
-//             'idCasier' => $request->casier ?: null,
-//             'colone5'  => $id,
-//         ]);
-
-//     $resultat = DB::table('entrepots as e')
-//         ->leftJoin('casiers as c', 'c.id', '=', 'e.idCasier')
-//         ->leftJoin('stocks as s', 's.id', '=', 'c.stock')
-//         ->leftJoin('stocks as s2', 's2.id', '=', 'e.stock')
-//         ->leftJoin('produits as p', function ($join) {
-//             $join->on('p.idStockage', '=', 's.id')
-//                 ->orOn('p.idStockage', '=', 's2.id');
-//         })
-//         ->where('e.id', $entrepot->id)
-//         ->select(
-//             'e.id',
-//             'e.nom',
-//             'e.etat',
-//             'e.zone',
-//             'c.nom as nomCasier',
-//             'c.id as idCasier',
-//             'c.stock as idStock',
-//             'p.idStockage as idProduitStock',
-//             's2.id as idProduitS2',
-//             's2.nom as nomStockS2',
-//             'p.id as idProduitFinal',
-//             'p.nomProduit'
-//         )
-//         ->get();
-
-
-
-//     // Calcul du stock total pour cet entrepôt
-//     $totalGeneral = DB::table('entrepots as e')
-//         ->leftJoin('casiers as c', 'c.id', '=', 'e.idCasier')
-//         ->leftJoin('stocks as s', 's.id', '=', 'c.stock')
-//         ->leftJoin('produits as p', 'p.idStockage', '=', 's.id')
-//         // ->leftJoin('produits as p', 's.idProduit', '=', 'p.id')
-//         ->where('e.id', $entrepot->id)
-//         ->sum('p.stock_initia');
-
-//     return response()->json([
-//         'message'      => "✅ Entrepôt créé avec succès.",
-//         'data'         => $resultat,
-//         'totalGeneral' => $totalGeneral,
-//     ], 201);
-// });
-
 Route::post('/modifeEntrepot/{id}', function (Request $request, $id) {
-    $calculerTotalStock = function ($entrepotId) {
-        return DB::table('entrepots as e')
-            ->join('casiers as c', 'e.idCasier', '=', 'c.id')
-            ->join('stocks as s', 'c.id', '=', 's.casier')
-            ->join('produits as p', 's.idProduit', '=', 'p.id')
-            ->where('e.id', $entrepotId)
-            ->sum('p.stock_initia');
-    };
 
     $entrepot = Entrepot::findOrFail($id);
     $entrepot->nom      = $request->nom ?? "";
@@ -769,18 +774,55 @@ Route::post('/modifeEntrepot/{id}', function (Request $request, $id) {
     $entrepot->idCasier = $request->casier ?? null;
     $entrepot->save(); // ✅ SAUVEGARDE
 
-    $resultat = DB::table('entrepots')
-        ->join('casiers', 'casiers.id', '=', 'entrepots.idCasier')
-        ->where('entrepots.id', $entrepot->id)
-        ->select('entrepots.*', 'casiers.nom AS nomCasier')
-        ->first();
+    // Fonction pour récupérer les détails de l'entrepôt
+    function resultat($entrepotId)
+    {
+        return DB::table('entrepots as e')
+            ->leftJoin('casiers as c', 'c.id', '=', 'e.idCasier')
+            ->leftJoin('stocks as s', 's.id', '=', 'c.stock')
+            ->leftJoin('stocks as s2', 's2.id', '=', 'e.stock')
+            ->leftJoin('produits as p', function ($join) {
+                $join->on('p.idStockage', '=', 's.id')
+                    ->orOn('p.idStockage', '=', 's2.id');
+            })
+            ->where('e.id', $entrepotId)
+            ->select(
+                'e.id',
+                'e.nom',
+                'e.etat',
+                'e.zone',
+                'c.nom as nomCasier',
+                'c.id as idCasier',
+                'c.stock as idStock',
+                'p.idStockage as idProduitStock',
+                's2.id as idProduitS2',
+                's2.nom as nomStockS2',
+                'p.id as idProduitFinal',
+                'p.nomProduit'
+            )
+            ->get();
+    }
+
+    // Fonction pour calculer le stock total
+    function totalGeneral($entrepotId)
+    {
+        return DB::table('entrepots as e')
+            ->leftJoin('casiers as c', 'c.id', '=', 'e.idCasier')
+            ->leftJoin('stocks as s', 's.id', '=', 'c.stock')
+            ->leftJoin('produits as p', 'p.idStockage', '=', 's.id')
+            ->where('e.id', $entrepotId)
+            ->sum('p.stock_initia');
+    }
+
+
 
     return response()->json([
         'message'      => "✅ Modifier avec succès.",
-        'data'         => $resultat,
-        'totalGeneral' => $calculerTotalStock($entrepot->id),
+        'data'         => resultat($entrepot->id),
+        'totalGeneral' => totalGeneral($entrepot->id),
     ], 201);
 });
+
 Route::post('/changer_activation_entrepot/{id}', function (Request $request, $id) {
     $calculerTotalStock = function ($entrepotId) {
         return DB::table('entrepots as e')
@@ -796,16 +838,51 @@ Route::post('/changer_activation_entrepot/{id}', function (Request $request, $id
     $entrepot->etat = $newEtat;
     $entrepot->save();
 
-    $resultat = DB::table('entrepots')
-        ->join('casiers', 'casiers.id', '=', 'entrepots.idCasier')
-        ->where('entrepots.id', $entrepot->id)
-        ->select('entrepots.*', 'casiers.nom AS nomCasier')
-        ->first();
+    function resultat($entrepotId)
+    {
+        return DB::table('entrepots as e')
+            ->leftJoin('casiers as c', 'c.id', '=', 'e.idCasier')
+            ->leftJoin('stocks as s', 's.id', '=', 'c.stock')
+            ->leftJoin('stocks as s2', 's2.id', '=', 'e.stock')
+            ->leftJoin('produits as p', function ($join) {
+                $join->on('p.idStockage', '=', 's.id')
+                    ->orOn('p.idStockage', '=', 's2.id');
+            })
+            ->where('e.id', $entrepotId)
+            ->select(
+                'e.id',
+                'e.nom',
+                'e.etat',
+                'e.zone',
+                'c.nom as nomCasier',
+                'c.id as idCasier',
+                'c.stock as idStock',
+                'p.idStockage as idProduitStock',
+                's2.id as idProduitS2',
+                's2.nom as nomStockS2',
+                'p.id as idProduitFinal',
+                'p.nomProduit'
+            )
+            ->get();
+    }
+
+    // Fonction pour calculer le stock total
+    function totalGeneral($entrepotId)
+    {
+        return DB::table('entrepots as e')
+            ->leftJoin('casiers as c', 'c.id', '=', 'e.idCasier')
+            ->leftJoin('stocks as s', 's.id', '=', 'c.stock')
+            ->leftJoin('produits as p', 'p.idStockage', '=', 's.id')
+            ->where('e.id', $entrepotId)
+            ->sum('p.stock_initia');
+    }
+
+
 
     return response()->json([
         'message'      => "✅ Modifier avec succès.",
-        'data'         => $resultat,
-        'totalGeneral' => $calculerTotalStock($entrepot->id),
+        'data'         => resultat($entrepot->id),
+        'totalGeneral' => totalGeneral($entrepot->id),
     ], 201);
 });
 
@@ -819,18 +896,36 @@ Route::delete('/suppression_entrepot/{id}', function ($id) {
 });
 
 
-
-
-
-
-
-
-
-
-
-
-
 ///CASIER
+Route::get('/liste_Casier_tout', function () {
+
+    $resultat = DB::table('casiers as c')
+        ->select(
+            'c.*',
+            'c.nom',
+            'u.name as user_name',
+            'e.id as entrepot_id',
+            'e.nom as entrepot_nom',
+            's.id as stock_id',
+            's.nom as stock_nom',
+            DB::raw('p."nomProduit" as nomProduit'),
+            'p.stock_initia as stock_total'
+        )
+        ->leftJoin('entrepots as e', 'e.idCasier', '=', 'c.id')
+        ->leftJoin('users as u', 'u.id', '=', 'c.colone5')
+        ->leftJoin('stocks as s', 's.casier', '=', 'c.id')
+        ->leftJoin('produits as p', 'p.idStockage', '=', 's.id')
+        ->orderBy('e.nom')
+        ->orderBy('c.nom')
+        ->orderBy('s.nom')
+        ->get();
+
+    return response()->json([
+        'status' => 'success',
+        'count' => $resultat->count(),
+        'data' => $resultat
+    ], 200);
+});
 Route::post('/changer_activation_casier/{id}', function (Request $request, $id) {
     $calculerTotalStock = function ($casierId) {
         $totalStock = DB::table('casiers as c')
@@ -853,8 +948,6 @@ Route::post('/changer_activation_casier/{id}', function (Request $request, $id) 
         'totalGeneral' => $calculerTotalStock($casier->id),
     ], 200);
 });
-
-
 Route::delete('/suppression_casier/{id}', function ($id) {
     $casier = Casier::findOrFail($id);
     $casier->delete();
@@ -863,7 +956,6 @@ Route::delete('/suppression_casier/{id}', function ($id) {
         'message' => "✅ Casier supprimé avec succès.",
     ], 200);
 });
-
 Route::post('/modifecasier/{id}', function (Request $request, $id) {
     $calculerTotalStock = function ($casierId) {
         $totalStock = DB::table('casiers as c')
@@ -886,10 +978,8 @@ Route::post('/modifecasier/{id}', function (Request $request, $id) {
         'totalGeneral' => $calculerTotalStock($modification->id),
     ], 201);
 });
-
-
 Route::get('/HistoriqueTransfert/{id}', function ($id) {
-    $id = 1;
+    $id = 4;
 
     $Mouvementstock = DB::table('historiquetransferstocks as h')
         ->join('users as u', 'h.colone5', '=', 'u.id')
@@ -913,7 +1003,6 @@ Route::get('/HistoriqueTransfert/{id}', function ($id) {
         ->get();
     return response()->json($Mouvementstock);
 });
-
 Route::get('/MouvementStock/{id}', function ($id) {
     $id = 1;
     $Mouvementstock = DB::table('mouvementstocks')
@@ -934,27 +1023,6 @@ Route::get('/MouvementStock/{id}', function ($id) {
 
     return response()->json($Mouvementstock);
 });
-// Route::get('/MouvementStock/{id}', function ($id) {
-//     // $id = (int) $id; // ✅ forcer en entier car la colonne est INTEGER
-//     $id = 2;
-//     $Mouvementstock = DB::table('mouvementstocks')
-//         ->join('users', 'mouvementstocks.colone5', '=', 'users.id')
-//         ->where('mouvementstocks.casier', $id)
-//         ->select(
-//             'mouvementstocks.id',
-//             'mouvementstocks.casier',
-//             'mouvementstocks.colone5',
-//             'mouvementstocks.stock',
-//             'mouvementstocks.created_at',
-//             'users.name',
-//             'users.prenom',
-//             'users.activation'
-//         )
-//         ->get();
-
-//     return response()->json($Mouvementstock);
-// });
-
 Route::get('/liste_Casier', function () {
     $resultat = DB::table('casiers as c')
         ->leftJoin('entrepots as e', 'e.idCasier', '=', 'c.id')
@@ -972,16 +1040,14 @@ Route::get('/liste_Casier', function () {
             'p.stock_initia as stockTotal'
         )
         ->get();
-
     return response()->json($resultat);
 });
-
 Route::post('/creationCasier/{id}', function (Request $request, $id) {
 
     $calculerTotalStock = function ($entrepotId) {
         return $totalStock = DB::table('casiers as c')
-            ->join('stocks as s', 'c.stock', '=', 's.casier')  // exactement comme SQL
-            ->join('produits as p', 'p.id', '=', 's.id')      // exactement comme SQL
+            ->join('stocks as s', 'c.stock', '=', 's.casier')
+            ->join('produits as p', 'p.id', '=', 's.id')
             ->where('c.id', $entrepotId)
             ->sum('p.stock_initia');
 
@@ -1001,81 +1067,6 @@ Route::post('/creationCasier/{id}', function (Request $request, $id) {
         'totalGeneral'   => $calculerTotalStock($nouveauCasier->id),
     ], 201);
 });
-// Route::post('/creationCasier/{id}', function (Request $request, $id) {
-//     $id = 4;
-//     // function calculerTotalStock($idCasier): float
-//     // {
-//     //     return DB::table('stocks')
-//     //         ->join('produits', 'produits.id', '=', 'stocks.idProduit')
-//     //         ->where('stocks.casier', $idCasier) // ⚡ utiliser l'ID du casier
-//     //         ->select(DB::raw('SUM(produits.stock_initia) as total_stock'))
-//     //         ->value('total_stock') ?? 0;
-//     // }
-
-//     // // $casier = true;
-//     $casier = Casier::with(['stocks', 'transferts'])
-//         ->where('colone5',  $id)
-//         ->first();
-
-//     $casierId = $id; // ou $id passé à la route
-
-
-//     // $casier = DB::table('casiers')
-//     //     ->join('stocks', 'stocks.casier', '=', 'casiers.colone5')
-//     //     ->leftJoin('historiquetransferstocks', 'historiquetransferstocks.casierSource', '=', 'casiers.colone5')
-//     //     ->select(
-//     //         'casiers.*',
-//     //         'stocks.*',
-//     //         'historiquetransferstocks.*'
-//     //     )
-//     //     ->where('casiers.colone5', $casierId)
-//     //     ->limit(1)
-//     //     ->first();
-
-//     // $casier = DB::table('casiers')
-//     //     ->leftJoin('stocks', 'stocks.casier', '=', 'casiers.colone5')
-//     //     ->leftJoin('historiquetransferstocks', 'historiquetransferstocks.casierSource', '=', 'casiers.colone5')
-//     //     ->select(
-//     //         'casiers.*',
-//     //         'stocks.id as stock_id',
-//     //         'historiquetransferstocks.id as historique_id'
-//     //     )
-//     //     ->where('casiers.colone5', $casierId)
-//     //     ->first();
-//     $casier = false;
-//     if ($casier) {
-//         // $totalStock = calculerTotalStock($casierId);
-//         // $totalTransfert = DB::table('historiquetransferstocks')
-//         //     ->where('casierSource', $casierId)
-//         //     ->sum('stock');
-//         // $totalGeneral = $totalStock + $totalTransfert;
-//         $totalStock  = 2;
-//         $totalGeneral = $totalStock;
-//         return response()->json([
-//             'message'        => "Vous avez déjà un casier.",
-//             'data'           => $casier,
-//             'totalGeneral'   => $totalGeneral,
-//         ], 200);
-//     }
-//     $nouveauCasier = Casier::create([
-//         'nom'     => $request->nom,
-//         'etat'    => $request->etat,
-//         'colone5' => $casierId,
-//     ]);
-
-//     $idCasier       = $casierId;
-//     $totalStock  = 2;
-//     $totalGeneral = $totalStock;
-
-//     $totalGeneral   =  $totalStock;
-//     return response()->json([
-//         'message'        => 'Casier bien sauvegardé',
-//         'data'           => $nouveauCasier,
-//         'totalGeneral'   => $totalGeneral,
-//     ], 201);
-// });
-
-//// 2em projet parti 1 Stock
 Route::get('/liste_Caisier', function () {
     $user = Casier::all();
     return response()->json($user);
@@ -1104,7 +1095,6 @@ Route::get('/liste_Stock', function () {
 
     return response()->json($user);
 });
-
 Route::post('/creationStock/{id}', function (Request $request, $id) {
 
     $produit = Produit::findOrFail($request->idProduit);
@@ -1280,12 +1270,6 @@ Route::put('/modifier_categori/{id}', function (Request $request, $id) {
     ]);
 });
 
-
-
-
-
-
-
 Route::put('/modifier_Stock/{id}/{idS}', function (Request $request, $id, $idS) {
     try {
         // Validation minimale
@@ -1418,69 +1402,25 @@ Route::put('/modifier_ArticleService/{id}', function (Request $request, $id) {
 
 ///produit
 Route::get('/liste_Produit', function () {
-    // $Produit = \App\Models\Produit::all();
-    $Produit = DB::table('produits')
-        ->leftJoin('stocks', DB::raw('CAST(stocks."idProduit" AS bigint)'), '=', 'produits.id')
+
+    $resultat = DB::table('produits as p')
+        ->leftJoin('users as u', 'p.colone5', '=', 'u.id')
+        ->leftJoin('stocks as s', 's.id', '=', DB::raw('p."idStockage"'))
+        ->leftJoin('casiers as c', 's.casier', '=', 'c.id')
+        ->leftJoin('entrepots as e', DB::raw('e."idCasier"'), '=', 'c.id')
         ->select(
-            'produits.id',
-            'produits.nomProduit',
-            'produits.type_categorie',
-            'produits.categorie',
-            'produits.prix',
-            'produits.stock_initia',
-            'produits.stock_minimum',
-            'produits.zone',
-            'produits.code_compta',
-            'produits.colonne',
-            'produits.date_peremption',
-            'produits.colone5',
-
-            // Concaténer tous les entrepôts d’un même produit
-            DB::raw("STRING_AGG(stocks.entrepot::text, ', ') as entrepot"),
-            DB::raw("STRING_AGG(stocks.casier::text, ', ') as casier"),
-            DB::raw("STRING_AGG(stocks.etat::text, ', ') as colonnes_stock"),
-
-            // Nombre de colonnes similaires
-            DB::raw('COALESCE(COUNT(stocks.etat), 0) as total_meme_colonne')
+            'p.*',
+            'e.nom as entrepot',
+            'e.id as idEntrepot',
+            'c.nom as casier',
+            'c.id as idCasier',
+            'c.created_at as DateCasier',
+            'u.name as utilisateur'
         )
-        ->groupBy(
-            'produits.id',
-            'produits.nomProduit',
-            'produits.type_categorie',
-            'produits.categorie',
-            'produits.prix',
-            'produits.stock_initia',
-            'produits.stock_minimum',
-            'produits.date_peremption',
-            'produits.colone5',
-            'produits.zone',
-            'produits.code_compta',
-            'produits.etat',
-        )
+        // ->where(DB::raw('p."nomProduit"'), '=', 'eaque')
         ->get();
 
-    // $Produit = DB::table('stocks')
-    //     ->join('produits', DB::raw('CAST(stocks."idProduit" AS bigint)'), '=', 'produits.id')
-    //     ->select(
-    //         'stocks.id',
-    //         'stocks.entrepot',
-    //         'stocks.casier',
-    //         // 'stocks.colonnes',
-    //         'stocks.idProduit',
-    //         'produits.colonnes',
-    //         'produits.nomProduit',
-    //         'produits.type_categorie',
-    //         'produits.categorie',
-    //         'produits.prix',
-    //         'produits.stock_initia',
-    //         'produits.date_peremption',
-    //         DB::raw('(SELECT COUNT(*) FROM stocks s WHERE s.colonne = stocks.colonne) as total_meme_colonne')
-    //     )
-    //     ->get();
-    if ($Produit->isEmpty()) {
-        return response()->json(['message' => 'Aucun utilisateur trouvé'], 404);
-    }
-    return response()->json($Produit);
+    return response()->json($resultat);
 });
 Route::post('/creationProduit', function (Request $request) {
     try {
@@ -1658,14 +1598,10 @@ Route::put('/modifier_tier/{id}', function ($id, Request $request) {
 
     return response()->json($tier);
 });
-///////2em gestion de categori article et service tiers
-///////2em gestion de categori article et service tiers
-///////2em gestion de categori article et service tiers
 
+///////2em gestion de categori article et service tiers
 ///////1em gestion de fournisseur ET CATEGORIE
-///////1em gestion de fournisseur ET CATEGORIE
-///////1em gestion de fournisseur ET CATEGORIE
-///////// categorie
+
 Route::post('/creationCategorie', function (Request $request) {
     $user = Categorie::create([
         'nom'     => $request->nom,
@@ -1719,7 +1655,6 @@ Route::patch('/changer_activationCategorie/{id}', function ($id, Request $reques
         'activation' => $categorie->etat
     ]);
 });
-
 
 /// groupe
 Route::get('/liste_Groupe', function () {

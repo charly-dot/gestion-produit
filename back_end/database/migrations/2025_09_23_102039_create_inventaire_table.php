@@ -16,6 +16,7 @@
                 $table->string('date')->nullable();
                 $table->bigInteger('idEntrepot')->nullable();
                 $table->bigInteger('idCasier')->nullable();
+                $table->string('action')->nullable();
                 $table->bigInteger('idProduit')->nullable();
                 $table->date('dateCreation')->nullable();
                 $table->string('reference')->nullable();

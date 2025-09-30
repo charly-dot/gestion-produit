@@ -23,10 +23,12 @@ class InventaireSeeder extends Seeder
             $prefix = $prefixes[array_rand($prefixes)];
             $number = str_pad(mt_rand(0, 9999), 4, '0', STR_PAD_LEFT);
             $reference = $prefix . $number;
+            $noms = ['Ajouter', 'Supprimer'];
 
             Inventaire::create([
                 'date'         => null, // champ "date" vide comme demandé
                 'idEntrepot'   => mt_rand(1, 10),
+                'action'       => $noms[array_rand($noms)],
                 'idCasier'     => mt_rand(1, 8),
                 'idProduit'    => mt_rand(1, 8),
                 'dateCreation' => date('Y-m-d', strtotime("+" . ($i - 1) . " days", $startDate)),

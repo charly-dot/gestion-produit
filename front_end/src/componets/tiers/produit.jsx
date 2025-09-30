@@ -882,7 +882,140 @@ export function Produit() {
     }
   }, [formDataSearcheStock]);
 
+  /// modification de stock
+
+  const [produit_nom_filtre, setproduit_nom_filtre] = useState([]);
+  const [ORIGINE_produit_nom_filtre, set_ORIGINE_produit_nom_filtre] = useState(
+    []
+  );
+  const [formData_produit_select, setformData_produit_select] = useState({
+    produit: "",
+  });
+  const listeProduit = async () => {
+    try {
+      const response = await axios.get(
+        "http://127.0.0.1:8000/api/liste_Produit"
+      );
+      setproduit_nom_filtre(response.data);
+      set_ORIGINE_produit_nom_filtre(response.data);
+    } catch (err) {
+      setErrors("Erreur lors du chargement des produits.");
+    }
+  };
+
+  // useEffect(() => {
+  //   listeProduit();
+  // }, []);
+
+  const select_Produit = (e) => {
+    const { name, value } = e.target;
+    setformData_produit_select((prev) => ({ ...prev, [name]: value }));
+
+    // ⚡ déclenche la recherche automatique
+    handleSearcheSubmitan_select_produit(value);
+  };
+  // Rechercher
+  const [produitSelectionne, setProduitSelectionne] = useState(null); // ✅ un seul produit
+
+  const handleSearcheSubmitan_select_produit = (produit) => {
+    const filtered = ORIGINE_produit_nom_filtre.find(
+      (item) => item.nomProduit === produit
+    );
+    setProduitSelectionne(filtered); // ✅ met à jour directement le produit sélectionné
+  };
+
+  const [
+    formData_produit_insertion_stock_transfert,
+    setformData_produit_insertion_stock_transfert,
+  ] = useState({
+    idProduit: "",
+    stock_actuel: "",
+    entrepotSource: "",
+    casierSource: "",
+    motif: "",
+  });
+
+  // 🔥 Sync automatique avec produitSelectionne
   React.useEffect(() => {
+    if (produitSelectionne) {
+      setformData_produit_insertion_stock_transfert((prev) => ({
+        ...prev,
+        idProduit: produitSelectionne.id || "",
+        stock_actuel: produitSelectionne.stock_initia || "",
+        entrepotSource: produitSelectionne.idEntrepot || "",
+        casierSource: produitSelectionne.idCasier || "",
+        entrepotSourcenom: produitSelectionne.entrepot || "",
+        casierSourcenom: produitSelectionne.casier || "",
+      }));
+    }
+  }, [produitSelectionne]);
+
+  // Gestion des changements
+  const onChangeData_produit_insertion_stock_transfert = (e) => {
+    const { name, value } = e.target;
+    setformData_produit_insertion_stock_transfert((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const onSubmitData_produit_insertion_stock_transfert = async (e) => {
+    e.preventDefault();
+    setError("");
+    setSuccess(false);
+
+    try {
+      const data = new FormData();
+
+      for (const key in formData_produit_insertion_stock_transfert) {
+        data.append(key, formData_produit_insertion_stock_transfert[key]);
+      }
+
+      const response = await axios.post(
+        `http://127.0.0.1:8000/api/insertion_stock_transfert/${DonneSession.id}`,
+        data,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+
+      setformData_produit_insertion_stock_transfert({
+        idProduit: "",
+        stock_actuel: "",
+        entrepotSource: "",
+        casierSource: "",
+        stock_transferer: "",
+        entrepot_destinateur: "",
+        casier_destinateur: "",
+      });
+      listesHE_tout();
+      handleSelect("LISTE DE TRANSFERT", " ");
+      showMessage("success", response.data.message);
+    } catch (err) {
+      if (err.response) {
+        console.log(err.response.data);
+        showMessage("error", err.response.data.message);
+      } else {
+        console.log("Erreur inconnue :", err.message);
+        showMessage("error", "Une erreur est survenue");
+      }
+    }
+  };
+
+  const [tout_liste_casier, settout_liste_casier] = useState([]);
+  const [tout_liste_entrepot, settout_liste_entrepot] = useState([]);
+  const tout_liste = async () => {
+    try {
+      const response = await axios.get("http://127.0.0.1:8000/api/tout_liste");
+      settout_liste_entrepot(response.data.entrepot_liste);
+      settout_liste_casier(response.data.casier_liste);
+    } catch (err) {
+      setErrors("Erreur lors du chargement des entrepôts et casiers.");
+    }
+  };
+
+  const [ajouter_supprimer, setajouter_supprimer] = useState("initial");
+
+  React.useEffect(() => {
+    listeProduit();
     liste_Entrepot();
     liste_Caisier();
     listeProduitModifierInventaire();
@@ -981,6 +1114,238 @@ export function Produit() {
               </button>
             ))}
           </div>
+
+          {ActivationAffichage === "STOCK" && (
+            <div className="bg-white p-8 rounded-xl shadow-md  justify-center">
+              <form
+                onSubmit={handleSearcheSubmitan_select_produit}
+                method="post"
+              >
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                  <div></div>
+                  <div className="flex flex-col">
+                    <label className="font-semibold text-gray-700 text-sm md:text-base mb-2">
+                      PRODUIT
+                    </label>
+                    <select
+                      name="produit"
+                      value={formData_produit_select.produit}
+                      onChange={select_Produit}
+                      required
+                      className="w-full md:w-[40vh] px-4 py-3 border border-gray-300 rounded-lg text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="">...</option>
+                      {[
+                        ...new Set(
+                          produit_nom_filtre.map((item) => item.nomProduit)
+                        ),
+                      ].map((nomProduit, index) => (
+                        <option key={index} value={nomProduit}>
+                          {nomProduit}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div></div>
+                </div>
+              </form>
+              <form
+                onSubmit={onSubmitData_produit_insertion_stock_transfert}
+                className="w-full max-w-5xl"
+              >
+                <input
+                  type="hidden"
+                  name="idProduit"
+                  value={formData_produit_insertion_stock_transfert.idProduit}
+                />
+
+                {/* Ligne 2 */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                  <div className="flex flex-col">
+                    <label className="font-semibold text-gray-700 text-sm md:text-base mb-2">
+                      STOCK ACTUEL
+                    </label>
+                    <input
+                      type="text"
+                      name="stock_actuel"
+                      disabled
+                      onChange={onChangeData_produit_insertion_stock_transfert}
+                      value={
+                        formData_produit_insertion_stock_transfert.stock_actuel
+                      }
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+
+                  <div className="flex flex-col">
+                    <label className="font-semibold text-gray-700 text-sm md:text-base mb-2">
+                      ENTREPÔT SOURCE
+                    </label>
+                    <input
+                      disabled
+                      name="entrepotSourcenom"
+                      value={
+                        formData_produit_insertion_stock_transfert.entrepotSourcenom
+                      }
+                      type="text"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <input
+                      disabled
+                      name="entrepotSource"
+                      onChange={onChangeData_produit_insertion_stock_transfert}
+                      value={
+                        formData_produit_insertion_stock_transfert.entrepotSource
+                      }
+                      type="hidden"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+
+                  <div className="flex flex-col">
+                    <label className="font-semibold text-gray-700 text-sm md:text-base mb-2">
+                      CASIER
+                    </label>
+                    <input
+                      disabled
+                      name="casierSourcenom"
+                      value={
+                        formData_produit_insertion_stock_transfert.casierSourcenom
+                      }
+                      type="text"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <input
+                      disabled
+                      name="casierSource"
+                      onChange={onChangeData_produit_insertion_stock_transfert}
+                      value={
+                        formData_produit_insertion_stock_transfert.casierSource
+                      }
+                      type="hidden"
+                      className="w-full md:w-[40vh] px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+
+                  {/* MOTIF uniquement si état = initial */}
+                  <div className="flex flex-col">
+                    <label className="font-semibold text-gray-700 text-sm md:text-base mb-2">
+                      MOTIF
+                    </label>
+                    <select
+                      required
+                      onChange={onChangeData_produit_insertion_stock_transfert}
+                      value={formData_produit_insertion_stock_transfert.motif}
+                      name="motif"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="">...</option>
+                      <option value="Stock initia">Stock initia</option>
+                      <option value="Correction de stock">
+                        Correction de stock
+                      </option>
+                    </select>
+                  </div>
+                  {/* {ajouter_supprimer === "iniDDDtDial" && (
+                    
+                  )} */}
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  {ajouter_supprimer === "INSERTION" && (
+                    <div className="flex flex-col mb-6">
+                      <label className="font-semibold text-gray-700 text-sm md:text-base mb-2">
+                        NOUVEL STOCK
+                      </label>
+                      <input
+                        value={
+                          formData_produit_insertion_stock_transfert.nouvelStock
+                        }
+                        onChange={
+                          onChangeData_produit_insertion_stock_transfert
+                        }
+                        name="nouvelStock"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        type="number"
+                      />
+                    </div>
+                  )}
+                  <div className="flex flex-col"></div>
+                </div>
+                {/* Boutons */}
+                <div className="grid grid-cols-3 md:grid-cols-3 gap-6 mb-6">
+                  <div></div>
+                  <div>
+                    {ajouter_supprimer === "initial" ? (
+                      <div className="gap-6 flex justify-center space-x-4">
+                        <button
+                          type="submit"
+                          onClick={() => setajouter_supprimer("seconde")}
+                          disabled={
+                            !formData_produit_insertion_stock_transfert.idProduit ||
+                            !formData_produit_insertion_stock_transfert.motif
+                          }
+                          className={`text-white font-bold px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 
+              ${
+                !formData_produit_insertion_stock_transfert.idProduit ||
+                !formData_produit_insertion_stock_transfert.motif
+                  ? "bg-blue-200 cursor-not-allowed"
+                  : "bg-blue-500 hover:bg-blue-600"
+              }`}
+                        >
+                          MODIFIER
+                        </button>
+
+                        <button
+                          type="button"
+                          disabled={
+                            !formData_produit_insertion_stock_transfert.idProduit ||
+                            !formData_produit_insertion_stock_transfert.motif
+                          }
+                          className={`text-white font-bold px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 
+              ${
+                !formData_produit_insertion_stock_transfert.idProduit ||
+                !formData_produit_insertion_stock_transfert.motif
+                  ? "bg-red-200 cursor-not-allowed"
+                  : "bg-red-500 hover:bg-red-600"
+              }`}
+                        >
+                          ANNULER
+                        </button>
+                      </div>
+                    ) : ajouter_supprimer === "seconde" ? (
+                      <div className="gap-6 flex justify-center space-x-4">
+                        <button
+                          type="submit"
+                          onClick={() => setajouter_supprimer("INSERTION")}
+                          className="text-white font-bold bg-blue-500 hover:bg-blue-600 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                          AJOUTER
+                        </button>
+                        <button
+                          type="button"
+                          className="text-white font-bold bg-red-500 hover:bg-red-600 px-4 py-3 border border-red-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                        >
+                          SUPPRIMER
+                        </button>
+                      </div>
+                    ) : ajouter_supprimer === "INSERTION" ? (
+                      <div className="gap-6 flex justify-center space-x-4">
+                        <button
+                          type="submit"
+                          onClick={() => setajouter_supprimer(false)}
+                          className="text-white font-bold bg-blue-500 hover:bg-blue-600 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                          ENREGISTRER
+                        </button>
+                      </div>
+                    ) : null}
+                  </div>
+                  <div></div>
+                </div>
+              </form>
+            </div>
+          )}
+
           {ActivationAffichage === "modification_PRODUIT_inventaire" &&
             Donne_PRODUIT && (
               <div>
@@ -2487,7 +2852,7 @@ export function Produit() {
               </div>
             </div>
           )}
-          {ActivationAffichage === "STOCK" && (
+          {/* {ActivationAffichage === "STOCK" && (
             <div className="bg-white p-8 rounded-2xl shadow-lg">
               {insertionStock ? (
                 <div>
@@ -2509,7 +2874,6 @@ export function Produit() {
                     </h1>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {/* ENTREPOT */}
                       <div className="flex items-center gap-4">
                         <label className="w-32 font-medium text-gray-700">
                           ENTREPOT :
@@ -2546,15 +2910,7 @@ export function Produit() {
                           className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                           <option value=""></option>
-                          {/* {[
-                            ...new Set(
-                              OriginalListe.map((item) => item.casier)
-                            ),
-                          ].map((casier, index) => (
-                            <option key={`casier-${index}`} value={casier}>
-                              {casier}
-                            </option>
-                          ))} */}
+
                           {OriginalListeEntrepot.map((item) => (
                             <option key={item.id} value={item.id}>
                               {item.nom}
@@ -2592,7 +2948,6 @@ export function Produit() {
                         <span className="text-red-600"> ***</span>
                       </div>
 
-                      {/* Champ code_compta visible uniquement si un produit est sélectionné */}
                       {formDataSearcheStock.nomProduit && (
                         <div className="flex items-center gap-4 mt-2">
                           <label className="w-32 font-medium text-gray-700">
@@ -2620,7 +2975,6 @@ export function Produit() {
                       )}
                     </div>
 
-                    {/* Boutons */}
                     <div className="flex flex-col sm:flex-row justify-end gap-4 mt-6">
                       <button
                         type="submit"
@@ -2630,7 +2984,6 @@ export function Produit() {
                       </button>
                       <button
                         type="button"
-                        // on
                         onClick={() => setinsertionStock(false)}
                         className="w-full sm:w-auto bg-red-500 text-white py-2 px-6 rounded-md hover:bg-red-600 transition"
                       >
@@ -2638,116 +2991,6 @@ export function Produit() {
                       </button>
                     </div>
                   </form>
-                  {/* <form onSubmit={handleSubmit_STOCK}>
-                    <h1 className="text-center text-2xl font-bold text-blue-600 mb-6">
-                      CREATION
-                    </h1>
-
-                   
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="flex items-center gap-4">
-                        <label className="w-32 font-medium text-gray-700">
-                          ENTREPOT :
-                        </label>
-
-                        <input
-                          type="text"
-                          name="entreport"
-                          value={formDataS.entrepot}
-                          onChange={handleChangeS}
-                          required
-                          className=" flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-32"
-                        />
-                        <span className="text-red-600"> ***</span>
-                      </div>
-                      <div className="flex items-center gap-4">
-                        <label className="w-32 font-medium text-gray-700">
-                          CASIER:
-                        </label>
-
-                        <input
-                          type="text"
-                          value={formDataS.casier}
-                          onChange={handleChangeS}
-                          name="casier"
-                          required
-                          className=" flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-32"
-                        />
-                        <span className="text-red-600"> ***</span>
-                      </div>
-
-                      <div className="flex items-center gap-4">
-                        <label className="w-32 font-medium text-gray-700">
-                          PRODUIT :
-                        </label>
-                        <select
-                          name="nomProduit"
-                          value={formDataSearcheStock.nomProduit} 
-                          onChange={handleChangeSearcheStock}
-                          required
-                          className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-32"
-                        >
-                          <option value="">...</option>
-                          {[
-                            ...new Set(
-                              OriginalListe.map((item) => item.nomProduit)
-                            ),
-                          ].map((nomProduit, index) => (
-                            <option
-                              key={`nomProduit-${index}`}
-                              value={nomProduit}
-                            >
-                              {nomProduit}
-                            </option>
-                          ))}
-                        </select>
-                        <span className="text-red-600"> ***</span>
-                      </div>
-
-                      {formDataSearcheStock.nomProduit && (
-                        <div className="flex items-center gap-4 mt-2">
-                          <label className="w-32 font-medium text-gray-700">
-                            CODE COMPTA :
-                          </label>
-                          <select
-                            name="idProduit"
-                            value={formDataS.id || ""}
-                            onChange={handleChangeS}
-                            required
-                            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-32"
-                          >
-                            <option value="">...</option>
-                            {OriginalListe.filter(
-                              (item) =>
-                                item.nomProduit ===
-                                formDataSearcheStock.nomProduit
-                            ).map((item) => (
-                              <option key={item.id} value={item.id}>
-                                {item.categorie}{" "}
-                               
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex flex-col sm:flex-row justify-end gap-4 mt-6">
-                      <button
-                        type="submit"
-                        className="w-full sm:w-auto bg-blue-600 text-white py-2 px-6 rounded-md hover:bg-blue-700 transition"
-                      >
-                        VALIDER
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setinsertionStock(false)}
-                        className="w-full sm:w-auto bg-red-500 text-white py-2 px-6 rounded-md hover:bg-red-600 transition"
-                      >
-                        ANNULER
-                      </button>
-                    </div>
-                  </form> */}
                 </div>
               ) : (
                 <div>
@@ -2797,7 +3040,7 @@ export function Produit() {
                 </div>
               )}
             </div>
-          )}
+          )} */}
           {ActivationAffichage === "modificationSTOCK" && (
             <div className="bg-white p-8 rounded-2xl shadow-lg">
               <form onSubmit={modifeStock}>

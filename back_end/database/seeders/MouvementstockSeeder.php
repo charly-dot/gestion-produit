@@ -13,7 +13,7 @@ class MouvementstockSeeder extends Seeder
      */
     public function run(): void
     {
-        for ($i = 0; $i < 10; $i++) {
+        for ($i = 0; $i < 40; $i++) {
             Mouvementstock::create([
                 'date' => now()->subDays(rand(0, 30)), // date aléatoire sur 30 jours
                 'entrepot' => rand(1, 6),              // id entrepot
