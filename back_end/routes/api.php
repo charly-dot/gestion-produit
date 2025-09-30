@@ -32,12 +32,8 @@ Route::get('/tout_liste', function () {
     ]);
 });
 
-
 /// 3em projet parti 2 stock
 /// 3em projet parti 2 stock
-/// 3em projet parti 2 stock
-
-
 ///transfert de stock
 Route::post('/insertion_stock_transfert/{id}', function (Request $request, $id) {
     $nouvelStock = (int)$request->stock_actuel - (int)$request->stock_transferer;
@@ -63,7 +59,6 @@ Route::post('/insertion_stock_transfert/{id}', function (Request $request, $id) 
         'data'    => $nouveauInventaire,
     ], 201);
 });
-
 
 /// MOUVEMENT DE STOCK
 Route::get('/MouvementStockEntrepot_inventaire', function () {

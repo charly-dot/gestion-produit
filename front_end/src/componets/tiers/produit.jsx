@@ -1154,7 +1154,7 @@ export function Produit() {
                 className="w-full max-w-5xl"
               >
                 <input
-                  type="hidden"
+                  type="text"
                   name="idProduit"
                   value={formData_produit_insertion_stock_transfert.idProduit}
                 />

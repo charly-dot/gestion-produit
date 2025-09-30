@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             CasierSeeder::class,
             HistoriquetransferstockSeeder::class,
             InventaireSeeder::class,
+            UtilisateurSeeder::class,
 
         ]);
     }

@@ -52,4 +52,19 @@ cd front_end
 npm run dev
 
 
-/// LOGIN 
+////// AUTHONTIFICATION
+
+///consommateur
+nom de compte: Rakoto
+mot de passe :1234Rakoto,
+nom de compte: Ravelo
+mot de passe :1234Ravelo
+
+///fournisseur
+nom de compte: Rasolonirina
+mot de passe :1234Paul,
+
+nom de compte: Randria
+mot de passe :1234Randria
+
+
