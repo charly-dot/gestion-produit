@@ -408,9 +408,9 @@ export function Entrepot() {
   const ColunneMouvementStock = [
     { field: "id", headerName: "N°", width: 70 },
     { field: "date", headerName: "DATE", width: 150 },
-    { field: "entrepot", headerName: "ENTREPOT", width: 150 },
-    { field: "casier", headerName: "CASIER", width: 150 },
-    { field: "produit", headerName: "PRODUIT", width: 150 },
+    { field: "nomEntrepot", headerName: "ENTREPOT", width: 150 },
+    { field: "nomCasier", headerName: "CASIER", width: 150 },
+    { field: "nomProduit", headerName: "PRODUIT", width: 150 },
     { field: "stock", headerName: "STOCK", width: 100 },
     { field: "action", headerName: "ACTION", width: 120 },
     {
@@ -454,7 +454,7 @@ export function Entrepot() {
     const filtered = OrigineListeMouvementStock.filter((item) => {
       const matchEntrepot =
         formDataSearcheMouvement.entrepot === "" ||
-        (item.entrepot || "")
+        (item.nomEntrepot || "")
           .toLowerCase()
           .includes(formDataSearcheMouvement.entrepot.toLowerCase());
 
@@ -466,13 +466,13 @@ export function Entrepot() {
 
       const matchProduit =
         formDataSearcheMouvement.produit === "" ||
-        (item.produit || "")
+        (item.nomProduit || "")
           .toLowerCase()
           .includes(formDataSearcheMouvement.produit.toLowerCase());
 
       const matchEtat =
         formDataSearcheMouvement.etat === "" ||
-        (item.activation || "").toLowerCase() ===
+        (item.etat || "").toLowerCase() ===
           formDataSearcheMouvement.etat.toLowerCase();
 
       return matchEntrepot && matchUtilisateur && matchProduit && matchEtat;
@@ -1500,10 +1500,6 @@ export function Entrepot() {
     }
   };
 
-  // useEffect(() => {
-  //   listeProduit();
-  // }, []);
-
   const select_Produit = (e) => {
     const { name, value } = e.target;
     setformData_produit_select((prev) => ({ ...prev, [name]: value }));
@@ -1586,7 +1582,7 @@ export function Entrepot() {
         casier_destinateur: "",
       });
       listesHE_tout();
-      handleSelect("LISTE DE TRANSFERT", " ");
+      // handleSelect("LISTE DE TRANSFERT", " ");
       showMessage("success", response.data.message);
     } catch (err) {
       if (err.response) {
@@ -1741,8 +1737,10 @@ export function Entrepot() {
                     condition_navbar === "casiercree" ? "border-b-blue-500" : ""
                   }`}
                   onClick={() => {
+                    // handleSelectType("casiercree");
+                    // handleSelect("FicheCasier", "casiercree");
                     handleSelectType("casiercree");
-                    handleSelect("casiercree", "casiercree");
+                    handleSelect("FicheCasier", "casiercree");
                   }}
                 >
                   {donneCasierCreer.nom}
@@ -1832,7 +1830,7 @@ export function Entrepot() {
                 </button>
                 <button
                   className={`hover:border-b-blue-500 border border-gray-200 text-blue-500 py-1 px-10 ${
-                    condition_navbar === "MOUVEMENT DE STOCK"
+                    condition_navbar === "INVENTAIRE entrepot"
                       ? "border-b-blue-500"
                       : ""
                   }`}
@@ -1961,6 +1959,18 @@ export function Entrepot() {
                   <div></div>
                 </div>
               </form>
+              <div>
+                {message && (
+                  <div
+                    className={` right-4 bg-green-300 text-white pt-6 pb-6 px-[20%] text-center m-8 rounded text-lg shadow-md
+      ${message?.type === "success" ? "bg-green-500 text-white" : ""}
+      ${message?.type === "error" ? "bg-red-500 text-white" : ""}
+      ${message?.type === "warning" ? "bg-orange-500 text-white" : ""}`}
+                  >
+                    {message?.text}
+                  </div>
+                )}
+              </div>
               <form
                 onSubmit={onSubmitData_produit_insertion_stock_transfert}
                 className="w-full max-w-5xl"
@@ -2105,13 +2115,53 @@ export function Entrepot() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                   <div></div>
                   <div className="flex flex-col">
-                    <button className="w-full md:w-[40vh] bg-blue-500 hover:bg-blue-600 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button className="w-full md:w-[40vh] text-white font-bold bg-blue-500 hover:bg-blue-600 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                       ENREGISTRER
                     </button>
                   </div>
                   <div></div>
                 </div>
               </form>
+              <div>
+                <div>
+                  <div className=" rounded-lg shadow  ">
+                    <table className="table-auto w-full">
+                      <thead className="bg-gray-100 text-gray-700">
+                        <tr>
+                          <th className="px-4 py-2 text-left">PRODUIT</th>
+                          <th className="px-4 py-2 text-left">ENTREPOT</th>
+                          <th className="px-4 py-2 text-left">CASIER</th>
+                          <th className="px-4 py-2 text-left">QTE</th>
+                          <th className="px-4 py-2 text-left">MOTIFS</th>
+                        </tr>
+                      </thead>
+                      <tbody className="text-gray-600">
+                        <tr className="border-t">
+                          <td className="px-4 py-2">Jus</td>
+                          <td className="px-4 py-2">X</td>
+                          <td className="px-4 py-2">X4</td>
+                          <td className="px-4 py-2">09</td>
+                          <td className="px-4 py-2">stock initial</td>
+                        </tr>
+                        <tr className="border-t">
+                          <td className="px-4 py-2">Jus</td>
+                          <td className="px-4 py-2">Sous_sol</td>
+                          <td className="px-4 py-2">Tiroir gauche</td>
+                          <td className="px-4 py-2">07</td>
+                          <td className="px-4 py-2">stock initial</td>
+                        </tr>
+                        <tr className="border-t font-bold bg-gray-50">
+                          <td className="px-4 py-2">TOTAL</td>
+                          <td className="px-4 py-2"></td>
+                          <td className="px-4 py-2"></td>
+                          <td className="px-4 py-2">15</td>
+                          <td className="px-4 py-2"></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 
@@ -2410,6 +2460,11 @@ export function Entrepot() {
                           </button>
                         </div>
                       </form>
+                      <br />
+                      <br />
+                      <br />
+                      <br />
+                      <br />
                     </div>
                   </div>
                 ) : invetaireSelectionTypeAffichage === "liste" ? (
@@ -2627,23 +2682,40 @@ export function Entrepot() {
                     </Box>
                   </div>
                 ) : (
-                  <div className="flex flex-cols">
-                    <button
-                      onClick={() =>
-                        setinvetaireSelectionTypeAffichage("creation")
-                      }
-                      className="w-[30%] sm:w-auto bg-green-500 text-white py-2 px-6 rounded-md hover:bg-green-600 transition"
-                    >
-                      creation
-                    </button>
-                    <button
-                      onClick={() =>
-                        setinvetaireSelectionTypeAffichage("liste")
-                      }
-                      className="w-[30%] sm:w-auto bg-green-500 text-white py-2 px-6 rounded-md hover:bg-green-600 transition"
-                    >
-                      liste
-                    </button>
+                  <div className="bg-white shadow-md rounded-2xl p-6 mb-6">
+                    {" "}
+                    <div className=" item-center ml-[30%] ">
+                      <br />
+
+                      <br />
+                      <button
+                        onClick={() =>
+                          setinvetaireSelectionTypeAffichage("creation")
+                        }
+                        className=" px-[10%] m-6 py-5 bg-blue-500 font-bold text-white  rounded-md hover:bg-blue-600 transition"
+                      >
+                        creation
+                      </button>
+                      <button
+                        onClick={() =>
+                          setinvetaireSelectionTypeAffichage("liste")
+                        }
+                        className=" px-[10%]  py-5 bg-blue-500 font-bold text-white  rounded-md hover:bg-blue-600 transition"
+                      >
+                        liste
+                      </button>
+                      <br />
+                      <br />
+                      <br />
+                      <br />
+                      <br />
+                      <br />
+                      <br />
+                      <br />
+                      <br />
+                      <br />
+                      <br />
+                    </div>
                   </div>
                 )}
               </div>
@@ -3783,10 +3855,7 @@ export function Entrepot() {
           {ActivationAffichage === "MOUVEMENT DE STOCK" && (
             <div className="bg-white shadow-md rounded-2xl p-6 mb-6">
               <div className="flex items-center justify-between">
-                {/* Titre à gauche */}
                 <h1 className="text-xl font-bold text-gray-800"></h1>
-
-                {/* Formulaire à droite */}
                 <form
                   className="grid grid-cols-6 gap-4 items-end"
                   onSubmit={handleSearcheSubmitMouvementStock}
@@ -3822,13 +3891,11 @@ export function Entrepot() {
                       <option value=""> </option>
                       {[
                         ...new Set(
-                          OrigineListeMouvementStock.map(
-                            (item) => item.activation
-                          )
+                          OrigineListeMouvementStock.map((item) => item.etat)
                         ),
-                      ].map((activation, index) => (
-                        <option key={index} value={activation}>
-                          {activation}
+                      ].map((etat, index) => (
+                        <option key={index} value={etat}>
+                          {etat}
                         </option>
                       ))}
                     </select>

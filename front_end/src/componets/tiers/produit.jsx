@@ -933,6 +933,9 @@ export function Produit() {
     entrepotSource: "",
     casierSource: "",
     motif: "",
+    nouvelStock: "",
+    entrepotSourcenom: "",
+    casierSourcenom: "",
   });
 
   // 🔥 Sync automatique avec produitSelectionne
@@ -958,8 +961,8 @@ export function Produit() {
       [name]: value,
     }));
   };
-
-  const onSubmitData_produit_insertion_stock_transfert = async (e) => {
+  const [resultat, setresultat] = useState([]);
+  const onSubmitData_produit_insertion_stock = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess(false);
@@ -972,30 +975,41 @@ export function Produit() {
       }
 
       const response = await axios.post(
-        `http://127.0.0.1:8000/api/insertion_stock_transfert/${DonneSession.id}`,
+        `http://127.0.0.1:8000/api/modification_stock/${DonneSession.id}`,
         data,
         { headers: { "Content-Type": "multipart/form-data" } }
       );
-
+      tout_liste();
+      console.log(response.data);
+      setresultat(response.data.data);
       setformData_produit_insertion_stock_transfert({
         idProduit: "",
         stock_actuel: "",
-        entrepotSource: "",
-        casierSource: "",
-        stock_transferer: "",
-        entrepot_destinateur: "",
-        casier_destinateur: "",
+        entrepotSourcenom: "",
+        casierSourcenom: "",
+        motif: "",
+        nouvelStock: "",
       });
-      listesHE_tout();
-      handleSelect("LISTE DE TRANSFERT", " ");
-      showMessage("success", response.data.message);
+      setajouter_supprimer_confirmer(false);
+      showMessage("error", "Modification est bien sauvegarder");
     } catch (err) {
       if (err.response) {
         console.log(err.response.data);
         showMessage("error", err.response.data.message);
       } else {
-        console.log("Erreur inconnue :", err.message);
-        showMessage("error", "Une erreur est survenue");
+        // console.log("Erreur inconnue :", err.message);
+        // tout_liste();
+        // ajouter_supprimer("initial");
+        setformData_produit_insertion_stock_transfert({
+          idProduit: "",
+          stock_actuel: "",
+          entrepotSource: "",
+          casierSource: "",
+          motif: "",
+          nouvelStock: "",
+        });
+        setajouter_supprimer_confirmer(false);
+        showMessage("error", "Modification est bien sauvegarder");
       }
     }
   };
@@ -1013,6 +1027,8 @@ export function Produit() {
   };
 
   const [ajouter_supprimer, setajouter_supprimer] = useState("initial");
+  const [ajouter_supprimer_confirmer, setajouter_supprimer_confirmer] =
+    useState(true);
 
   React.useEffect(() => {
     listeProduit();
@@ -1117,232 +1133,351 @@ export function Produit() {
 
           {ActivationAffichage === "STOCK" && (
             <div className="bg-white p-8 rounded-xl shadow-md  justify-center">
-              <form
-                onSubmit={handleSearcheSubmitan_select_produit}
-                method="post"
-              >
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                  <div></div>
-                  <div className="flex flex-col">
-                    <label className="font-semibold text-gray-700 text-sm md:text-base mb-2">
-                      PRODUIT
-                    </label>
-                    <select
-                      name="produit"
-                      value={formData_produit_select.produit}
-                      onChange={select_Produit}
-                      required
-                      className="w-full md:w-[40vh] px-4 py-3 border border-gray-300 rounded-lg text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      <option value="">...</option>
-                      {[
-                        ...new Set(
-                          produit_nom_filtre.map((item) => item.nomProduit)
-                        ),
-                      ].map((nomProduit, index) => (
-                        <option key={index} value={nomProduit}>
-                          {nomProduit}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div></div>
-                </div>
-              </form>
-              <form
-                onSubmit={onSubmitData_produit_insertion_stock_transfert}
-                className="w-full max-w-5xl"
-              >
-                <input
-                  type="text"
-                  name="idProduit"
-                  value={formData_produit_insertion_stock_transfert.idProduit}
-                />
-
-                {/* Ligne 2 */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-                  <div className="flex flex-col">
-                    <label className="font-semibold text-gray-700 text-sm md:text-base mb-2">
-                      STOCK ACTUEL
-                    </label>
-                    <input
-                      type="text"
-                      name="stock_actuel"
-                      disabled
-                      onChange={onChangeData_produit_insertion_stock_transfert}
-                      value={
-                        formData_produit_insertion_stock_transfert.stock_actuel
-                      }
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-
-                  <div className="flex flex-col">
-                    <label className="font-semibold text-gray-700 text-sm md:text-base mb-2">
-                      ENTREPÔT SOURCE
-                    </label>
-                    <input
-                      disabled
-                      name="entrepotSourcenom"
-                      value={
-                        formData_produit_insertion_stock_transfert.entrepotSourcenom
-                      }
-                      type="text"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                    <input
-                      disabled
-                      name="entrepotSource"
-                      onChange={onChangeData_produit_insertion_stock_transfert}
-                      value={
-                        formData_produit_insertion_stock_transfert.entrepotSource
-                      }
-                      type="hidden"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-
-                  <div className="flex flex-col">
-                    <label className="font-semibold text-gray-700 text-sm md:text-base mb-2">
-                      CASIER
-                    </label>
-                    <input
-                      disabled
-                      name="casierSourcenom"
-                      value={
-                        formData_produit_insertion_stock_transfert.casierSourcenom
-                      }
-                      type="text"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                    <input
-                      disabled
-                      name="casierSource"
-                      onChange={onChangeData_produit_insertion_stock_transfert}
-                      value={
-                        formData_produit_insertion_stock_transfert.casierSource
-                      }
-                      type="hidden"
-                      className="w-full md:w-[40vh] px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-
-                  {/* MOTIF uniquement si état = initial */}
-                  <div className="flex flex-col">
-                    <label className="font-semibold text-gray-700 text-sm md:text-base mb-2">
-                      MOTIF
-                    </label>
-                    <select
-                      required
-                      onChange={onChangeData_produit_insertion_stock_transfert}
-                      value={formData_produit_insertion_stock_transfert.motif}
-                      name="motif"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      <option value="">...</option>
-                      <option value="Stock initia">Stock initia</option>
-                      <option value="Correction de stock">
-                        Correction de stock
-                      </option>
-                    </select>
-                  </div>
-                  {/* {ajouter_supprimer === "iniDDDtDial" && (
-                    
-                  )} */}
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                  {ajouter_supprimer === "INSERTION" && (
-                    <div className="flex flex-col mb-6">
-                      <label className="font-semibold text-gray-700 text-sm md:text-base mb-2">
-                        NOUVEL STOCK
-                      </label>
-                      <input
-                        value={
-                          formData_produit_insertion_stock_transfert.nouvelStock
-                        }
-                        onChange={
-                          onChangeData_produit_insertion_stock_transfert
-                        }
-                        name="nouvelStock"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        type="number"
-                      />
+              {ajouter_supprimer_confirmer ? (
+                <div>
+                  <form
+                    onSubmit={handleSearcheSubmitan_select_produit}
+                    method="post"
+                  >
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                      <div></div>
+                      <div className="flex flex-col">
+                        <label className="font-semibold text-gray-700 text-sm md:text-base mb-2">
+                          PRODUIT
+                        </label>
+                        <select
+                          name="produit"
+                          value={formData_produit_select.produit}
+                          onChange={select_Produit}
+                          required
+                          className="w-full md:w-[40vh] px-4 py-3 border border-gray-300 rounded-lg text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                          <option value="">...</option>
+                          {[
+                            ...new Set(
+                              produit_nom_filtre.map((item) => item.nomProduit)
+                            ),
+                          ].map((nomProduit, index) => (
+                            <option key={index} value={nomProduit}>
+                              {nomProduit}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div></div>
                     </div>
-                  )}
-                  <div className="flex flex-col"></div>
-                </div>
-                {/* Boutons */}
-                <div className="grid grid-cols-3 md:grid-cols-3 gap-6 mb-6">
-                  <div></div>
-                  <div>
-                    {ajouter_supprimer === "initial" ? (
-                      <div className="gap-6 flex justify-center space-x-4">
-                        <button
-                          type="submit"
-                          onClick={() => setajouter_supprimer("seconde")}
-                          disabled={
-                            !formData_produit_insertion_stock_transfert.idProduit ||
-                            !formData_produit_insertion_stock_transfert.motif
-                          }
-                          className={`text-white font-bold px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 
-              ${
-                !formData_produit_insertion_stock_transfert.idProduit ||
-                !formData_produit_insertion_stock_transfert.motif
-                  ? "bg-blue-200 cursor-not-allowed"
-                  : "bg-blue-500 hover:bg-blue-600"
-              }`}
-                        >
-                          MODIFIER
-                        </button>
+                  </form>
+                  <form
+                    onSubmit={onSubmitData_produit_insertion_stock}
+                    className="w-full max-w-5xl"
+                  >
+                    {message && (
+                      <div
+                        className={` right-4 bg-green-300 text-white pt-6 pb-6 px-[20%] text-center m-8 rounded shadow-md
+      ${message.type === "success" ? "bg-green-500 text-white" : ""}
+      ${message.type === "error" ? "bg-red-500 text-white" : ""}
+      ${message.type === "warning" ? "bg-orange-500 text-white" : ""}`}
+                      >
+                        {message.text}
+                      </div>
+                    )}
+                    <input
+                      type="hidden"
+                      name="idProduit"
+                      value={
+                        formData_produit_insertion_stock_transfert.idProduit
+                      }
+                    />
 
-                        <button
-                          type="button"
-                          disabled={
-                            !formData_produit_insertion_stock_transfert.idProduit ||
-                            !formData_produit_insertion_stock_transfert.motif
+                    {/* Ligne 2 */}
+                    <div
+                      className={` ${
+                        ajouter_supprimer === "INSERTION"
+                          ? "grid grid-cols-1 md:grid-cols-3 gap-6 mb-6"
+                          : "grid grid-cols-1 md:grid-cols-4 gap-6 mb-6"
+                      }`}
+                    >
+                      <div className="flex flex-col">
+                        <label className="font-semibold text-gray-700 text-sm md:text-base mb-2">
+                          STOCK ACTUEL
+                        </label>
+                        <input
+                          type="text"
+                          name="stock_actuel"
+                          disabled
+                          onChange={
+                            onChangeData_produit_insertion_stock_transfert
                           }
-                          className={`text-white font-bold px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 
-              ${
-                !formData_produit_insertion_stock_transfert.idProduit ||
-                !formData_produit_insertion_stock_transfert.motif
-                  ? "bg-red-200 cursor-not-allowed"
-                  : "bg-red-500 hover:bg-red-600"
-              }`}
-                        >
-                          ANNULER
-                        </button>
+                          value={
+                            formData_produit_insertion_stock_transfert.stock_actuel
+                          }
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
                       </div>
-                    ) : ajouter_supprimer === "seconde" ? (
-                      <div className="gap-6 flex justify-center space-x-4">
-                        <button
-                          type="submit"
-                          onClick={() => setajouter_supprimer("INSERTION")}
-                          className="text-white font-bold bg-blue-500 hover:bg-blue-600 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        >
-                          AJOUTER
-                        </button>
-                        <button
-                          type="button"
-                          className="text-white font-bold bg-red-500 hover:bg-red-600 px-4 py-3 border border-red-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-                        >
-                          SUPPRIMER
-                        </button>
+
+                      <div className="flex flex-col">
+                        <label className="font-semibold text-gray-700 text-sm md:text-base mb-2">
+                          ENTREPÔT SOURCE
+                        </label>
+                        <input
+                          disabled
+                          name="entrepotSourcenom"
+                          value={
+                            formData_produit_insertion_stock_transfert.entrepotSourcenom
+                          }
+                          type="text"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                        <input
+                          disabled
+                          name="entrepotSource"
+                          onChange={
+                            onChangeData_produit_insertion_stock_transfert
+                          }
+                          value={
+                            formData_produit_insertion_stock_transfert.entrepotSource
+                          }
+                          type="hidden"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
                       </div>
-                    ) : ajouter_supprimer === "INSERTION" ? (
-                      <div className="gap-6 flex justify-center space-x-4">
-                        <button
-                          type="submit"
-                          onClick={() => setajouter_supprimer(false)}
-                          className="text-white font-bold bg-blue-500 hover:bg-blue-600 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        >
-                          ENREGISTRER
-                        </button>
+
+                      <div className="flex flex-col">
+                        <label className="font-semibold text-gray-700 text-sm md:text-base mb-2">
+                          CASIER
+                        </label>
+                        <input
+                          disabled
+                          name="casierSourcenom"
+                          value={
+                            formData_produit_insertion_stock_transfert.casierSourcenom
+                          }
+                          type="text"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                        <input
+                          disabled
+                          name="casierSource"
+                          onChange={
+                            onChangeData_produit_insertion_stock_transfert
+                          }
+                          value={
+                            formData_produit_insertion_stock_transfert.casierSource
+                          }
+                          type="hidden"
+                          className="w-full md:w-[40vh] px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
                       </div>
-                    ) : null}
-                  </div>
-                  <div></div>
+
+                      {/* MOTIF uniquement si état = initial */}
+
+                      {ajouter_supprimer !== "INSERTION" && (
+                        <div className="flex flex-col">
+                          <label className="font-semibold text-gray-700 text-sm md:text-base mb-2">
+                            MOTIF
+                          </label>
+                          <select
+                            required
+                            onChange={
+                              onChangeData_produit_insertion_stock_transfert
+                            }
+                            value={
+                              formData_produit_insertion_stock_transfert.motif
+                            }
+                            name="motif"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          >
+                            <option value="">...</option>
+                            <option value="Stock initia">Stock initia</option>
+                            <option value="Correction de stock">
+                              Correction de stock
+                            </option>
+                          </select>
+                        </div>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                      {ajouter_supprimer === "INSERTION" && (
+                        <div className="flex flex-col mb-6">
+                          <label className="font-semibold text-gray-700 text-sm md:text-base mb-2">
+                            NOUVEL STOCK
+                          </label>
+                          <input
+                            value={
+                              formData_produit_insertion_stock_transfert.nouvelStock
+                            }
+                            onChange={
+                              onChangeData_produit_insertion_stock_transfert
+                            }
+                            name="nouvelStock"
+                            required
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            type="number"
+                          />
+                        </div>
+                      )}
+                      <div className="flex flex-col"></div>
+                    </div>
+                    {/* Boutons */}
+                    <div className="grid grid-cols-3 md:grid-cols-3 gap-6 mb-6">
+                      <div></div>
+                      <div>
+                        {ajouter_supprimer === "initial" && (
+                          <div className="gap-6 flex justify-center space-x-4">
+                            <button
+                              type="button"
+                              onClick={() => setajouter_supprimer("seconde")}
+                              disabled={
+                                !formData_produit_insertion_stock_transfert.idProduit ||
+                                !formData_produit_insertion_stock_transfert.motif
+                              }
+                              className="text-white font-bold px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-blue-500 hover:bg-blue-600"
+                            >
+                              MODIFIER
+                            </button>
+
+                            <button
+                              type="button"
+                              disabled={
+                                !formData_produit_insertion_stock_transfert.idProduit ||
+                                !formData_produit_insertion_stock_transfert.motif
+                              }
+                              className="text-white font-bold px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-red-500 hover:bg-red-600"
+                            >
+                              ANNULER
+                            </button>
+                          </div>
+                        )}
+
+                        {ajouter_supprimer === "seconde" && (
+                          <div className="gap-6 flex justify-center space-x-4">
+                            <button
+                              type="button"
+                              onClick={() => setajouter_supprimer("INSERTION")}
+                              className="text-white font-bold bg-blue-500 hover:bg-blue-600 px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                              AJOUTER
+                            </button>
+
+                            <button
+                              type="button"
+                              className="text-white font-bold bg-red-500 hover:bg-red-600 px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                            >
+                              SUPPRIMER
+                            </button>
+                          </div>
+                        )}
+
+                        {ajouter_supprimer === "INSERTION" && (
+                          <div className="gap-6 flex justify-center space-x-4">
+                            <button
+                              type="submit" // 🔹 seul bouton submit
+                              className="text-white font-bold bg-blue-500 hover:bg-blue-600 px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                              ENREGISTRER
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                      <div></div>
+                    </div>
+                  </form>
                 </div>
-              </form>
+              ) : (
+                <div>
+                  <div>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                      <div className="flex flex-col">
+                        <label className="font-semibold text-gray-700 text-sm md:text-base mb-2">
+                          PRODUIT
+                        </label>
+                        <h1 className="w-full px-4 py-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                          {resultat.nomProduit || ""}
+                        </h1>
+                      </div>
+                      <div className="flex flex-col">
+                        <label className="font-semibold text-gray-7 00 text-sm md:text-base mb-2">
+                          STOCK
+                        </label>
+
+                        <h1 className="w-full px-4 py-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                          {resultat.stock_initia || ""}
+                        </h1>
+                      </div>
+                      <div className="flex flex-col">
+                        <label className="font-semibold text-gray-700 text-sm md:text-base mb-2">
+                          ENTREPOT
+                        </label>
+
+                        <h1 className="w-full px-4 py-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                          {resultat.nomEntrepot || ""}
+                        </h1>
+                      </div>
+                      <div className="flex flex-col">
+                        <label className="font-semibold text-gray-700 text-sm md:text-base mb-2">
+                          CASIER
+                        </label>
+
+                        <h1 className="w-full px-4 py-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                          {resultat.nomCasier || ""}
+                        </h1>
+                      </div>
+                    </div>
+                    {message && (
+                      <div
+                        className={` right-4 bg-green-300 text-white pt-6 pb-6 px-[20%] text-center m-8 rounded shadow-md
+      ${message.type === "success" ? "bg-green-500 text-white" : ""}
+      ${message.type === "error" ? "bg-red-500 text-white" : ""}
+      ${message.type === "warning" ? "bg-orange-500 text-white" : ""}`}
+                      >
+                        {message.text}
+                      </div>
+                    )}
+                    <br />
+                    <div>
+                      <div className=" rounded-lg shadow  ">
+                        <table className="table-auto w-full">
+                          <thead className="bg-gray-100 text-gray-700">
+                            <tr>
+                              <th className="px-4 py-2 text-left">PRODUIT</th>
+                              <th className="px-4 py-2 text-left">ENTREPOT</th>
+                              <th className="px-4 py-2 text-left">CASIER</th>
+                              <th className="px-4 py-2 text-left">QTE</th>
+                              <th className="px-4 py-2 text-left">MOTIFS</th>
+                            </tr>
+                          </thead>
+                          <tbody className="text-gray-600">
+                            <tr className="border-t">
+                              <td className="px-4 py-2">Jus</td>
+                              <td className="px-4 py-2">X</td>
+                              <td className="px-4 py-2">X4</td>
+                              <td className="px-4 py-2">09</td>
+                              <td className="px-4 py-2">stock initial</td>
+                            </tr>
+                            <tr className="border-t">
+                              <td className="px-4 py-2">Jus</td>
+                              <td className="px-4 py-2">Sous_sol</td>
+                              <td className="px-4 py-2">Tiroir gauche</td>
+                              <td className="px-4 py-2">07</td>
+                              <td className="px-4 py-2">stock initial</td>
+                            </tr>
+                            <tr className="border-t font-bold bg-gray-50">
+                              <td className="px-4 py-2">TOTAL</td>
+                              <td className="px-4 py-2"></td>
+                              <td className="px-4 py-2"></td>
+                              <td className="px-4 py-2">15</td>
+                              <td className="px-4 py-2"></td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                    <br />
+                    <br />
+                    <br />
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

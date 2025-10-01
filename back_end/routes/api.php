@@ -34,6 +34,47 @@ Route::get('/tout_liste', function () {
 
 /// 3em projet parti 2 stock
 /// 3em projet parti 2 stock
+
+///modification de stock
+
+Route::post('/modification_stock/{id}', function (Request $request, $id) {
+    $nouvelStock = (int) $request->stock_actuel + (int) $request->nouvelStock;
+
+    $produit = Produit::findOrFail($request->idProduit);
+    $produit->stock_initia = $nouvelStock;
+    $produit->save();
+
+    $nouveau = Mouvementstock::create([
+        'entrepot'       => $request->entrepotSource,
+        'entrepotFinal'  => $request->entrepot_destinateur,
+        'casier'         => $request->casierSource,
+        'produit'        => $request->idProduit,
+        'stock'          => $request->nouvelStock,
+        'date'           => now(),
+        'action'         => $request->motif,
+        'colone5'        => $id,
+    ]);
+
+    $result = DB::table('mouvementstocks as m')
+        ->join('casiers as c', 'c.id', '=', 'm.casier')
+        ->join('produits as p', 'p.id', '=', 'm.produit')
+        ->join('entrepots as e', 'e.id', '=', 'm.entrepot')
+        ->select(
+            'p.nomProduit as nomProduit',
+            'p.stock_initia as stock_initia',
+            'c.nom as nomCasier',
+            'e.nom as nomEntrepot'
+        )
+        ->where('m.id', $nouveau->id)
+        ->first();
+
+    return response()->json([
+        'message' => 'Modification bien sauvegardée',
+        'data'    => $result,
+    ], 201);
+});
+
+
 ///transfert de stock
 Route::post('/insertion_stock_transfert/{id}', function (Request $request, $id) {
     $nouvelStock = (int)$request->stock_actuel - (int)$request->stock_transferer;
@@ -55,7 +96,7 @@ Route::post('/insertion_stock_transfert/{id}', function (Request $request, $id) 
     ]);
 
     return response()->json([
-        'message' => 'Inventaire bien sauvegardé',
+        'message' => 'Stock est bien transferer',
         'data'    => $nouveauInventaire,
     ], 201);
 });
@@ -545,25 +586,47 @@ Route::post('/insertion_inventaire_produit/{id}', function (Request $request, $i
             ->get();
     } else {
         $produits = DB::table('inventaires as i')
-            ->join('entrepots as e', 'e.id', '=', 'i.idEntrepot')
-            ->join('casiers as c', 'c.id', '=', 'e.idCasier')
-            ->join('stocks as s', 's.id', '=', 'c.stock')
-            ->join('produits as p', 's.id', '=', 'p.idStockage')
+            ->join('entrepots as e', 'e.id', '=', DB::raw('i."idEntrepot"'))
+            ->join('casiers as c', 'c.id', '=', DB::raw('e."idCasier"'))
+            ->join('stocks as s', 's.id', '=', DB::raw('c."stock"'))
+            ->join('produits as p', 's.id', '=', DB::raw('p."idStockage"'))
             ->where('i.id', $nouveauInventaire->id)
+            ->where('p.id', $nouveauInventaire->idProduit)
             ->select(
-                'p.nomProduit as produit_nom',
+                DB::raw('p."nomProduit" as produit_nom'),
                 'p.id as idProduit',
-                'p.stock_initia',
-                'p.stock_Encours1',
-                'p.stock_Encours2',
+                DB::raw('p."stock_initia"'),
+                DB::raw('p."stock_Encours1"'),
+                DB::raw('p."stock_Encours2"'),
                 'e.nom as nomEntrepot',
                 'e.id as idEntrepot_nom',
                 'c.nom as nomCasier',
                 'c.id as idCasier',
                 'i.id',
-                'i.reference as referenceInventaire',
+                DB::raw('i."reference" as referenceInventaire')
             )
             ->get();
+
+        // $produits = DB::table('inventaires as i')
+        //     ->join('entrepots as e', 'e.id', '=', 'i.idEntrepot')
+        //     ->join('casiers as c', 'c.id', '=', 'e.idCasier')
+        //     ->join('stocks as s', 's.id', '=', 'c.stock')
+        //     ->join('produits as p', 's.id', '=', 'p.idStockage')
+        //     ->where('i.id', $nouveauInventaire->id)
+        //     ->select(
+        //         'p.nomProduit as produit_nom',
+        //         'p.id as idProduit',
+        //         'p.stock_initia',
+        //         'p.stock_Encours1',
+        //         'p.stock_Encours2',
+        //         'e.nom as nomEntrepot',
+        //         'e.id as idEntrepot_nom',
+        //         'c.nom as nomCasier',
+        //         'c.id as idCasier',
+        //         'i.id',
+        //         'i.reference as referenceInventaire',
+        //     )
+        //     ->get();
     }
 
 
@@ -608,11 +671,11 @@ Route::post('/insertion_inventaire_produit/{id}', function (Request $request, $i
     //     $produits = collect([$produit]);
     // }
 
-    return response()->json([
-        'message'        => 'Inventaire bien sauvegardé',
-        'data'           => $produits,
+    // return response()->json([
+    //     'message'        => 'Inventaire bien sauvegardé',
+    //     'data'           => $produits,
 
-    ], 201);
+    // ], 201);
 });
 
 ///ENTREPOT
@@ -1297,6 +1360,7 @@ Route::put('/modifier_Stock/{id}/{idS}', function (Request $request, $id, $idS) 
         ], 500);
     }
 });
+
 
 
 
