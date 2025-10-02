@@ -160,6 +160,25 @@ Route::get('/HistoriqueEntrepot_inventaire', function () {
             'h.*'
         )
         ->get();
+
+    // $result = DB::table('historiquetransferstocks as h')
+    //     ->join('users as u', 'h.colone5', '=', 'u.id')
+    //     ->join('produits as p', 'h.produit', '=', 'p.id')
+    //     ->leftJoin('entrepots as es', 'h.entrepotSource', '=', 'es.id')
+    //     ->leftJoin('entrepots as ef', 'h.entrepotFinal', '=', 'ef.id')
+    //     ->leftJoin('casiers as cs', 'h.casierSource', '=', 'cs.id')
+    //     ->leftJoin('casiers as cf', 'h.casierFinal', '=', 'cf.id')
+    //     ->select(
+    //         'ef.zone',
+    //         DB::raw('es.nom as "nomEntrepotSource"'),
+    //         DB::raw('ef.nom as "nomEntrepotFinal"'),
+    //         DB::raw('cs.nom as "nomCasierSource"'),
+    //         DB::raw('cf.nom as "nomCasierFinal"'),
+    //         DB::raw('u.name as "nomUtilisateur"'),
+    //         DB::raw('p."nomProduit"'),
+    //         'h.*'
+    //     )
+    //     ->get();
     return response()->json($result);
 });
 /// ENTREPOT partie 2 INVENTAIRE
@@ -678,34 +697,8 @@ Route::post('/insertion_inventaire_produit/{id}', function (Request $request, $i
     // ], 201);
 });
 
-///ENTREPOT
 Route::get('/HistoriqueEntrepot/{id}', function ($id) {
-    $id = 4;
-
-    $Mouvementstock = DB::table('historiquetransferstocks as h')
-        ->join('users as u', 'h.colone5', '=', 'u.id')
-        ->join('produits as p', 'h.produit', '=', 'p.id')
-        ->leftJoin('entrepots as es', 'h.entrepotSource', '=', 'es.id')
-        ->leftJoin('entrepots as ef', 'h.entrepotFinal', '=', 'ef.id')
-        ->leftJoin('casiers as cs', 'h.casierSource', '=', 'cs.id')
-        ->leftJoin('casiers as cf', 'h.casierFinal', '=', 'cf.id')
-        ->select(
-            'ef.zone',
-            DB::raw('es.nom as "nomEntrepotSource"'),
-            DB::raw('ef.nom as "nomEntrepotFinal"'),
-            DB::raw('cs.nom as "nomCasierSource"'),
-            DB::raw('cf.nom as "nomCasierFinal"'),
-            DB::raw('u.name as "nomUtilisateur"'),
-            DB::raw('p."nomProduit"'),
-            'h.*'
-        )
-        ->where('h.entrepotFinal', $id)
-        ->orWhere('h.entrepotSource', $id)
-        ->get();
-    return response()->json($Mouvementstock);
-});
-Route::get('/HistoriqueEntrepot/{id}', function ($id) {
-    $id = 4;
+    // $id = 1;
 
     $Mouvementstock = DB::table('historiquetransferstocks as h')
         ->join('users as u', 'h.colone5', '=', 'u.id')
@@ -732,7 +725,8 @@ Route::get('/HistoriqueEntrepot/{id}', function ($id) {
 
 Route::get('/MouvementStockEntrepot/{id}', function ($id) {
 
-    $id = 2;
+    // $id = 1;
+    // $Mouvementstock = "slfj";
     $Mouvementstock = DB::table('mouvementstocks')
         ->join('users', 'mouvementstocks.colone5', '=', 'users.id')
         ->join('entrepots', 'mouvementstocks.entrepot', '=', 'entrepots.id')
@@ -953,7 +947,6 @@ Route::delete('/suppression_entrepot/{id}', function ($id) {
     ], 200);
 });
 
-
 ///CASIER
 Route::get('/liste_Casier_tout', function () {
 
@@ -1037,8 +1030,27 @@ Route::post('/modifecasier/{id}', function (Request $request, $id) {
     ], 201);
 });
 Route::get('/HistoriqueTransfert/{id}', function ($id) {
-    $id = 4;
-
+    // $id = 2;
+    // $Mouvementstock = DB::table('historiquetransferstocks as h')
+    //     // ->join('users as u', 'h.colone5', '=', 'u.id')
+    //     // ->join('produits as p', 'h.produit', '=', 'p.id')
+    //     ->leftJoin('entrepots as es', 'h.entrepotSource', '=', 'es.id')
+    //     ->leftJoin('entrepots as ef', 'h.entrepotFinal', '=', 'ef.id')
+    //     ->leftJoin('casiers as cs', 'h.casierSource', '=', 'cs.id')
+    //     ->leftJoin('casiers as cf', 'h.casierFinal', '=', 'cf.id')
+    //     ->select(
+    //         'ef.zone',
+    //         DB::raw('es.nom as "nomEntrepotSource"'),
+    //         DB::raw('ef.nom as "nomEntrepotFinal"'),
+    //         DB::raw('cs.nom as "nomCasierSource"'),
+    //         DB::raw('cf.nom as "nomCasierFinal"'),
+    //         // DB::raw('u.name as "nomUtilisateur"'),
+    //         // DB::raw('p."nomProduit"'),
+    //         'h.*'
+    //     )
+    //     ->where('h.casierFinal', $id)
+    //     ->orWhere('h.casierSource', $id)
+    //     ->get();
     $Mouvementstock = DB::table('historiquetransferstocks as h')
         ->join('users as u', 'h.colone5', '=', 'u.id')
         ->join('produits as p', 'h.produit', '=', 'p.id')
@@ -1056,8 +1068,6 @@ Route::get('/HistoriqueTransfert/{id}', function ($id) {
             DB::raw('p."nomProduit"'),
             'h.*'
         )
-        ->where('h.casierFinal', $id)
-        ->orWhere('h.casierSource', $id)
         ->get();
     return response()->json($Mouvementstock);
 });
@@ -1360,10 +1370,6 @@ Route::put('/modifier_Stock/{id}/{idS}', function (Request $request, $id, $idS) 
         ], 500);
     }
 });
-
-
-
-
 
 ///ArticleService
 Route::get('/liste_ArticleService', function () {
@@ -1889,7 +1895,3 @@ Route::patch('/changer_activation/{id}', function ($id, Request $request) {
         'activation' => $user->activation ? "activer" : "desactiver"
     ]);
 });
-
-///////1em gestion de fournisseur ET CATEGORIE
-///////1em gestion de fournisseur ET CATEGORIE
-///////1em gestion de fournisseur ET CATEGORIE

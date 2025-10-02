@@ -18,7 +18,7 @@ class UserFactory extends Factory
             'name'       => $this->faker->lastName,
             'prenom'     => $this->faker->firstName($sexe === 'Homme' ? 'male' : 'female'),
             'email'      => $this->faker->unique()->safeEmail,
-            'password'   => bcrypt('password'), // mot de passe par défaut
+            'password'   => bcrypt('password'),
             'sexe'       => $sexe,
 
             // ✅ Groupe métier plus réaliste

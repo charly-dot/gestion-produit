@@ -10,7 +10,7 @@ class TiersTableSeeder extends Seeder
     public function run()
     {
         // Crée 10 tiers aléatoires
-        Tier::factory()->count(10)->create();
+        Tier::factory()->count(5)->create();
 
         // Crée un tier fixe pour démonstration
         Tier::create([

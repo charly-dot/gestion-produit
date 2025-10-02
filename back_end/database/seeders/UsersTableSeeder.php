@@ -10,7 +10,7 @@ class UsersTableSeeder extends Seeder
     public function run()
     {
         // Crée 10 utilisateurs aléatoires
-        User::factory()->count(10)->create();
+        User::factory()->count(5)->create();
 
         // Crée un utilisateur fixe pour démonstration
         User::create([

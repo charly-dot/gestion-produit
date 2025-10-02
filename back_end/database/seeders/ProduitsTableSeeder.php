@@ -10,7 +10,7 @@ class ProduitsTableSeeder extends Seeder
     public function run()
     {
         // Crée 10 produits aléatoires
-        Produit::factory()->count(60)->create();
+        Produit::factory()->count(5)->create();
 
         Produit::create([
             'nomProduit' => 'ProduitDemo',
@@ -18,7 +18,7 @@ class ProduitsTableSeeder extends Seeder
             'stock_initia' => 50,
             'zone' => 'Antananarivo',
             'fichier' => 'demo.jpg',
-            'idStockage' => rand(1, 8),
+            'idStockage' => rand(1, 5),
             'type_categorie' => 'Alimentaire',
             'categorie' => 'Snack',
             'code_compta' => '001-002',
@@ -28,7 +28,7 @@ class ProduitsTableSeeder extends Seeder
             'colone2' => null,
             'colone3' => null,
             'colone4' => null,
-            'colone5' => 2,
+            'colone5' => 5,
         ]);
     }
 }

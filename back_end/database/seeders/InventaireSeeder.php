@@ -18,7 +18,7 @@ class InventaireSeeder extends Seeder
         // Date de départ pour dateCreation (tu peux modifier)
         $startDate = strtotime('2025-09-01');
 
-        for ($i = 1; $i <= 20; $i++) {
+        for ($i = 1; $i <= 5; $i++) {
             // choisir un préfixe aléatoire et un nombre à 4 chiffres
             $prefix = $prefixes[array_rand($prefixes)];
             $number = str_pad(mt_rand(0, 9999), 4, '0', STR_PAD_LEFT);
@@ -27,17 +27,17 @@ class InventaireSeeder extends Seeder
 
             Inventaire::create([
                 'date'         => null, // champ "date" vide comme demandé
-                'idEntrepot'   => mt_rand(1, 10),
+                'idEntrepot'   => mt_rand(1, 5),
                 'action'       => $noms[array_rand($noms)],
-                'idCasier'     => mt_rand(1, 8),
-                'idProduit'    => mt_rand(1, 8),
+                'idCasier'     => mt_rand(1, 5),
+                'idProduit'    => mt_rand(1, 5),
                 'dateCreation' => date('Y-m-d', strtotime("+" . ($i - 1) . " days", $startDate)),
                 'reference'    => $reference,
                 'colone1'      => 'Item ' . $i,
                 'colone2'      => null,
                 'colone3'      => null,
                 'colone4'      => null,
-                'colone5'      => mt_rand(1, 8),
+                'colone5'      => mt_rand(1, 5),
             ]);
         }
     }

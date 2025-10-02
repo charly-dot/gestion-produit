@@ -2,6 +2,7 @@ import * as React from "react";
 import { AuthContext } from "../../AuthContext";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { BarChart } from "@mui/x-charts/BarChart";
 import { useContext, useState } from "react";
 //tableau
 import Box from "@mui/material/Box";
@@ -204,68 +205,6 @@ export function Entrepot() {
       handleSelect("FicheCasier", "casiercree");
     }
   };
-  // const ajouterCasier = async (e) => {
-  //   e.preventDefault();
-  //   setError("");
-  //   setSuccess(false);
-
-  //   try {
-  //     const data = new FormData();
-  //     for (const key in formData) {
-  //       data.append(key, formData[key]);
-  //     }
-  //     const response = await axios.post(
-  //       `http://127.0.0.1:8000/api/creationCasier/${DonneSession.id}`,
-  //       data,
-  //       { headers: { "Content-Type": "multipart/form-data" } }
-  //     );
-
-  //     setdonneCasierCreer({
-  //       ...response.data.data,
-  //       totalGeneral: response.data.totalGeneral,
-  //     });
-
-  //     setdonneCasierCreer({
-  //       ...response.data.data,
-  //       totalGeneral: response.data.totalGeneral,
-  //     });
-
-  //     setformData({ nom: "", etat: "" });
-  //     listeC();
-  //     handleSelectType("casiercree");
-  //     handleSelect("FicheCasier", "casiercree");
-  //     showMessage("success", response.data.message);
-  //     console.log("tsy mety");
-  //     console.log("tsy mety");
-  //     console.log("tsy mety");
-  //     console.log("tsy mety");
-  //     // setformData({ nom: "", etat: "" });
-  //     // listeC();
-  //     // handleSelectType("casiercree");
-  //     // handleSelect("FicheCasier", "casiercree");
-  //     // showMessage("success", response.data.message);
-  //   } catch (err) {
-  //     if (err.response) {
-  //       setdonneCasierCreer({
-  //         ...err.response.data.data,
-  //         totalGeneral: err.response.data.totalGeneral,
-  //       });
-  //     } else {
-  //       showMessage("error", "Erreur réseau");
-  //     }
-  //     // console.log("dddddddddd");
-  //     console.log({
-  //       ...response.data.data,
-  //       totalGeneral: response.data.totalGeneral,
-  //     });
-  //     setformData({ nom: "", etat: "" });
-  //     handleSelectType("casiercree");
-  //     handleSelect("FicheCasier", "casiercree");
-  //     handleSelectType("casiercree");
-  //     handleSelect("FicheCasier", "casiercree");
-  //   }
-  // };
-
   ///stock de HISTORIQUE
 
   const [ListeHistoriqueTransfert, setListeHistoriqueTransfert] = useState([]);
@@ -275,7 +214,7 @@ export function Entrepot() {
     setLoading(true);
     try {
       const response = await axios.get(
-        `http://127.0.0.1:8000/api/HistoriqueEntrepot/${donneCasierCreer.id}`
+        `http://127.0.0.1:8000/api/HistoriqueEntrepot/${donneEntrepotCreer.id}`
       );
       setOriginalListehistorique(response.data);
       setListeHistoriqueTransfert(response.data);
@@ -380,9 +319,9 @@ export function Entrepot() {
   const ColunneHistoriqueTransfert = [
     { field: "id", headerName: "N°", width: 70 },
     { field: "date", headerName: "DATE", width: 100 },
-    { field: "nomEntrepotSource", headerName: "ENTREPOT SOURCE", width: 100 },
+    { field: "nomEntrepotSource", headerName: "ENTREPÔT SOURCE", width: 100 },
     { field: "nomCasierSource", headerName: "CASIER SOURCE", width: 100 },
-    { field: "nomEntrepotFinal", headerName: "ENTREPOT FINAL", width: 100 },
+    { field: "nomEntrepotFinal", headerName: "ENTREPÔT FINAL", width: 100 },
     { field: "nomCasierFinal", headerName: "CASIER FINAL", width: 100 },
     { field: "nomProduit", headerName: "PRODUIT", width: 120 },
     { field: "stock", headerName: " STOCK", width: 120 },
@@ -408,7 +347,7 @@ export function Entrepot() {
   const ColunneMouvementStock = [
     { field: "id", headerName: "N°", width: 70 },
     { field: "date", headerName: "DATE", width: 150 },
-    { field: "nomEntrepot", headerName: "ENTREPOT", width: 150 },
+    { field: "nomEntrepot", headerName: "ENTREPÔT", width: 150 },
     { field: "nomCasier", headerName: "CASIER", width: 150 },
     { field: "nomProduit", headerName: "PRODUIT", width: 150 },
     { field: "stock", headerName: "STOCK", width: 100 },
@@ -743,15 +682,15 @@ export function Entrepot() {
   ] = useState([]);
   const ColunneMouvementStockENTREPOT = [
     { field: "id", headerName: "N°", width: 70 },
-    { field: "nomEntrepot", headerName: "ENTREPOT", width: 100 },
+    { field: "nomEntrepot", headerName: "ENTREPÔT", width: 100 },
     { field: "nomCasier", headerName: "CASIER", width: 100 },
     { field: "nomProduit", headerName: "PRODUIT", width: 100 },
-    { field: "stock", headerName: "STOCK REEL", width: 100 },
-    { field: "stockCour", headerName: "STOCK ENCOUR", width: 100 },
+    { field: "stock", headerName: "STOCK RÉEL", width: 100 },
+    { field: "stockCour", headerName: "STOCK EN COURS", width: 100 },
     { field: "stock_initia", headerName: "STOCK FINAL", width: 120 },
-    { field: "documentLier", headerName: " DOCUMENT LIER", width: 120 },
+    { field: "documentLier", headerName: "DOCUMENT LIÉ", width: 120 },
     { field: "raison", headerName: "RAISON", width: 120 },
-    { field: "etat", headerName: "DATE", width: 120 },
+    { field: "date", headerName: "DATE", width: 120 },
     {
       field: "name",
       headerName: "UTILISATEUR",
@@ -766,7 +705,6 @@ export function Entrepot() {
       const response = await axios.get(
         `http://127.0.0.1:8000/api/MouvementStockEntrepot/${donneEntrepotCreer.id}`
       );
-
       setOrigineListeMouvementStockENTREPOT(response.data);
       setListeMouvementStockENTREPOT(response.data);
     } catch (err) {
@@ -885,9 +823,9 @@ export function Entrepot() {
   const ColunneHistoriqueStockENTREPOT = [
     { field: "id", headerName: "N°", width: 70 },
     { field: "date", headerName: "DATE", width: 100 },
-    { field: "nomEntrepotSource", headerName: "ENTREPOT SOURCE", width: 100 },
+    { field: "nomEntrepotSource", headerName: "ENTREPÔT SOURCE", width: 100 },
     { field: "nomCasierSource", headerName: "CASIER SOURCE", width: 100 },
-    { field: "nomEntrepotFinal", headerName: "ENTREPOT FINAL", width: 100 },
+    { field: "nomEntrepotFinal", headerName: "ENTREPÔT FINAL", width: 100 },
     { field: "nomCasierFinal", headerName: "CASIER FINAL", width: 100 },
     { field: "nomProduit", headerName: "PRODUIT", width: 120 },
     { field: "stock", headerName: " STOCK", width: 120 },
@@ -1238,13 +1176,13 @@ export function Entrepot() {
         </div>
       ),
     },
-    { field: "nomEntrepot", headerName: "ENTREPOT", width: 110 },
+    { field: "nomEntrepot", headerName: "ENTREPÔT", width: 110 },
     { field: "nomCasier", headerName: "CASIER", width: 130 },
     { field: "nomProduit", headerName: "PRODUIT", width: 140 },
     { field: "action", headerName: "ACTION", width: 110 },
-    { field: "stock_initia", headerName: "STOCK REEL", width: 110 },
+    { field: "stock_initia", headerName: "STOCK RÉEL", width: 110 },
     { field: "stock_Encours1", headerName: "STOCK EN COURS", width: 130 },
-    { field: "stock_Encours2", headerName: "STOCK EN FINAL", width: 110 },
+    { field: "stock_Encours2", headerName: "STOCK FINAL", width: 110 },
     { field: "name", headerName: "UTILISATEUR", width: 110 },
   ];
   const listeProduitModifierInventaire = async () => {
@@ -1342,9 +1280,9 @@ export function Entrepot() {
 
   const ColunneHistoriqueStockENTREPOT_inventaire = [
     { field: "date", headerName: "DATE", width: 100 },
-    { field: "nomEntrepotSource", headerName: "ENTREPOT SOURCE", width: 100 },
+    { field: "nomEntrepotSource", headerName: "ENTREPÔT SOURCE", width: 100 },
     { field: "nomCasierSource", headerName: "CASIER SOURCE", width: 100 },
-    { field: "nomEntrepotFinal", headerName: "ENTREPOT FINAL", width: 100 },
+    { field: "nomEntrepotFinal", headerName: "ENTREPÔT FINAL", width: 100 },
     { field: "nomCasierFinal", headerName: "CASIER FINAL", width: 100 },
     { field: "nomProduit", headerName: "PRODUIT", width: 120 },
     { field: "stock", headerName: " STOCK", width: 120 },
@@ -1382,7 +1320,7 @@ export function Entrepot() {
 
   const ColunneC_inventaire = [
     { field: "created_at", headerName: "DATE", width: 140 },
-    { field: "entrepot_nom", headerName: "ENTREPOT", width: 140 },
+    { field: "entrepot_nom", headerName: "ENTREPÔT", width: 140 },
     { field: "nom", headerName: "CASIER", width: 140 },
     { field: "nomproduit", headerName: "PRODUIT", width: 140 }, // ton JSON ne l’a pas encore
     { field: "stock_total", headerName: "STOCK", width: 140 },
@@ -1651,7 +1589,7 @@ export function Entrepot() {
               onClick={() => setShowTIERS((prev) => !prev)} // ✅ on utilise bien setShowTIERS
               className="cursor-pointer text-sm font-semibold text-gray-700 py-2 px-3 rounded-md hover:bg-blue-500 hover:text-white transition"
             >
-              ENTREPOT
+              ENTREPÔT
             </h1>
 
             {showTIERS && (
@@ -1681,7 +1619,7 @@ export function Entrepot() {
                   }}
                   className="block cursor-pointer text-gray-600 text-sm py-1 px-2 rounded hover:bg-blue-400 hover:text-white transition"
                 >
-                  CRÉER ENTREPOT
+                  CRÉER ENTREPÔT
                 </a>
                 <a
                   onClick={() => {
@@ -1690,7 +1628,7 @@ export function Entrepot() {
                   }}
                   className="block cursor-pointer text-gray-600 text-sm py-1 px-2 rounded hover:bg-blue-400 hover:text-white transition"
                 >
-                  LISTE ENTREPOT
+                  LISTE ENTREPÔT
                 </a>
                 <a
                   onClick={() => {
@@ -1743,8 +1681,8 @@ export function Entrepot() {
                     handleSelect("FicheCasier", "casiercree");
                   }}
                 >
-                  {donneCasierCreer.nom}
-                  {/* {donneCasierCreer.nom.toUpperCase()} */}
+                  {/* {donneCasierCreer.nom} */}
+                  {donneCasierCreer.nom.toUpperCase()}
                 </button>
 
                 <button
@@ -1892,7 +1830,7 @@ export function Entrepot() {
               </div>
             ) : (
               <div>
-                <button
+                {/* <button
                   className={`hover:border-b-blue-500 border border-gray-200 text-blue-500 py-1 px-10 ${
                     condition_navbar === "ENTREPOT" ? "border-b-blue-500" : ""
                   }`}
@@ -1920,7 +1858,7 @@ export function Entrepot() {
                       "HISTORIQUE DE TRANSFERT"
                     );
                   }}
-                ></button>
+                ></button> */}
               </div>
             )}
           </div>
@@ -2480,7 +2418,7 @@ export function Entrepot() {
                             htmlFor="entrepot"
                             className="font-semibold text-gray-700"
                           >
-                            ENTREPOTS
+                            ENTREPÔTS
                           </label>
                           <select
                             id="entrepot"
@@ -2829,7 +2767,7 @@ export function Entrepot() {
                 >
                   <div>
                     <label className="font-semibold text-gray-700">
-                      ENTREPOT
+                      ENTREPÔT
                     </label>
                     <select
                       name="entrepot"
@@ -2928,7 +2866,7 @@ export function Entrepot() {
 
                   {/* ETAT */}
                   <div>
-                    <label className="font-semibold text-gray-700">ETAT</label>
+                    <label className="font-semibold text-gray-700">ÉTAT</label>
                     <select
                       name="etat"
                       value={formDataSearcheHistoriqueENTREPOT.etat}
@@ -3047,7 +2985,7 @@ export function Entrepot() {
                 >
                   <div>
                     <label className="font-semibold text-gray-700">
-                      ENTREPOT
+                      ENTREPÔT
                     </label>
                     <select
                       name="entrepot"
@@ -3146,7 +3084,7 @@ export function Entrepot() {
 
                   {/* ETAT */}
                   <div>
-                    <label className="font-semibold text-gray-700">ETAT</label>
+                    <label className="font-semibold text-gray-700">ÉTAT</label>
                     <select
                       name="etat"
                       value={formDataSearcheMouvementENTREPOT.etat}
@@ -3243,42 +3181,23 @@ export function Entrepot() {
 
               <div className="p-6 mb-6 grid grid-cols-1">
                 <h1>NOM :</h1>
-                <h1>{donneEntrepotCreer.nom}</h1>
+                <h1 className="font-bold">{donneEntrepotCreer.nom}</h1>
               </div>
 
               <div className="p-6 mb-6 grid grid-cols-2 items-center">
                 <div>
-                  <h1>ETAT :</h1>
-                  <h1>{donneEntrepotCreer.etat}</h1>
+                  <h1>ÉTAT :</h1>
+                  <h1 className="font-bold">{donneEntrepotCreer.etat}</h1>
                 </div>
                 <div>
                   <h1>CASIER :</h1>
-                  <h1>{donneEntrepotCreer.nomCasier}</h1>
+                  <h1 className="font-bold">{donneEntrepotCreer.nomCasier}</h1>
                 </div>
               </div>
-              {/* <div>
-                <label
-                  htmlFor="zone"
-                  className="font-semibold text-gray-700 text-sm block"
-                >
-                  PRODUIT
-                </label>
-                <select name="produit" className="...">
-                  <option value="">...</option>
-                  <option value="">tout produit</option>
-                  {produits.map((item) => (
-                    <option
-                      key={item.idProduitFinal}
-                      value={item.idProduitFinal}
-                    >
-                      {item.nomProduit}
-                    </option>
-                  ))}
-                </select>
-              </div> */}
-              <div>
+
+              <div className="ml-6">
                 <h1>STOCK TOTAL :</h1>
-                <h1>{donneEntrepotCreer.totalGeneral}</h1>
+                <h1 className="font-bold">{donneEntrepotCreer.totalGeneral}</h1>
               </div>
 
               <div className="flex flex-col sm:flex-row justify-center gap-4 mt-6 text-lg fond-bold">
@@ -3339,7 +3258,7 @@ export function Entrepot() {
               <form className="items-center" onSubmit={ajouterEntrepot}>
                 <br />
                 <h1 className="text-center text-2xl font-bold text-blue-600 mb-6">
-                  CREATION
+                  CRÉATION
                 </h1>
                 {message && (
                   <div
@@ -3393,7 +3312,7 @@ export function Entrepot() {
 
                   <div className="flex items-center gap-4">
                     <label className="w-32 font-medium text-gray-700">
-                      ETAT :
+                      ÉTAT :
                     </label>
                     <select
                       name="etat"
@@ -3403,8 +3322,8 @@ export function Entrepot() {
                       className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="">...</option>
-                      <option value="activer">activer</option>
-                      <option value="desactiver">desactiver</option>
+                      <option value="activer">Activer</option>
+                      <option value="desactiver">Désactiver</option>
                     </select>
                     <span className="text-red-600">(*)</span>
                   </div>
@@ -3520,7 +3439,7 @@ export function Entrepot() {
 
                   <div className="flex items-center gap-4">
                     <label className="w-32 font-medium text-gray-700">
-                      ETAT :
+                      ÉTAT :
                     </label>
                     <select
                       name="etat"
@@ -3596,7 +3515,7 @@ export function Entrepot() {
               <form className="w-[60%] items-center" onSubmit={ajouterCasier}>
                 <br />
                 <h1 className="text-center text-2xl font-bold text-blue-600 mb-6">
-                  CREATION
+                  CRÉATION CASIER
                 </h1>
                 <br />
                 <br />
@@ -3612,7 +3531,7 @@ export function Entrepot() {
                   ].map((field) => (
                     <div key={field.name} className="flex items-center gap-4  ">
                       <label className=" font-medium text-gray-700 w-[20%]">
-                        {field.label}:
+                        {field.label} :
                       </label>
 
                       <input
@@ -3646,8 +3565,8 @@ export function Entrepot() {
                       className="flex-1 px-4 py-2 border rounded-md"
                     >
                       <option value="">...</option>
-                      <option value="activer">activer</option>
-                      <option value="desactiver">desactiver</option>
+                      <option value="activer">Activer</option>
+                      <option value="desactiver">Désactiver</option>
                     </select>
                     <span className="text-red-600">(*)</span>
                   </div>
@@ -3660,7 +3579,7 @@ export function Entrepot() {
                     type="submit"
                     className="w-full sm:w-auto bg-blue-600 text-white py-2 px-6 rounded-md hover:bg-blue-700 transition"
                   >
-                    VALIDER
+                    CRÉER
                   </button>
                   <button
                     type="button"
@@ -3695,24 +3614,28 @@ export function Entrepot() {
                 </div>
               )}
 
-              <div className="p-6 mb-6 grid grid-cols-1">
+              <div className="p-6 mb-6 flex flex-cols gap-6">
                 <h1>NOM :</h1>
-                <h1>{donneCasierCreer.nom}</h1>
+                <h1 className="font-bold">{donneCasierCreer.nom}</h1>
               </div>
               <div className="p-6 mb-6 grid grid-cols-2 items-center">
-                <div>
+                <div className=" mb-6 flex flex-cols gap-6">
                   <h1>ETAT :</h1>
-                  <h1>{donneCasierCreer.etat}</h1>
+                  <h1 className="font-bold">{donneCasierCreer.etat}</h1>
                 </div>
-                <div>
-                  <h1>ENTREPOT :</h1>
-                  <h1>{donneCasierCreer.entrepot}</h1>
+                <div className="flex flex-cols gap-6">
+                  <h1>ENTREPÔT :</h1>
+                  <h1 className="font-bold">{donneCasierCreer.entrepot}</h1>
                 </div>
               </div>
-              <div>
-                <h1>STOCK TOTAL :</h1>
-                <h1>{donneCasierCreer.totalGeneral}</h1>
+              <div className="ml-6 ">
+                <div className="flex flex-cols gap-6">
+                  <h1>STOCK TOTAL :</h1>
+                  <h1 className="font-bold">{donneCasierCreer.totalGeneral}</h1>
+                </div>
               </div>
+              <br />
+              <br />
               <div className="flex flex-col sm:flex-row justify-center gap-4 mt-6 text-lg font-bold">
                 {/* Modifier */}
                 <button
@@ -3750,6 +3673,9 @@ export function Entrepot() {
                   SUPPRIMER
                 </button>
               </div>
+
+              <br />
+              <h1 className="text-white">sf</h1>
             </div>
           )}
 
@@ -3861,9 +3787,13 @@ export function Entrepot() {
                   onSubmit={handleSearcheSubmitMouvementStock}
                 >
                   {[
-                    { label: "ENTREPOT", name: "entrepot", type: "text" },
-                    { label: "UTILISATEUR", name: "utilisateur", type: "text" },
-                    { label: "PRODUIT", name: "produit", type: "text" },
+                    { label: "ENTREPÔT :", name: "entrepot", type: "text" },
+                    {
+                      label: "UTILISATEUR :",
+                      name: "utilisateur",
+                      type: "text",
+                    },
+                    { label: "PRODUIT :", name: "produit", type: "text" },
                   ].map(({ label, name, type }) => (
                     <div key={name}>
                       <label className="font-semibold text-gray-700">
@@ -3881,7 +3811,9 @@ export function Entrepot() {
 
                   {/* ETAT */}
                   <div>
-                    <label className="font-semibold text-gray-700">ETAT</label>
+                    <label className="font-semibold text-gray-700">
+                      ÉTAT :
+                    </label>
                     <select
                       name="etat"
                       value={formDataSearcheMouvement.etat}
@@ -3974,7 +3906,7 @@ export function Entrepot() {
                       htmlFor="entrepot"
                       className="font-semibold text-gray-700 text-sm block"
                     >
-                      ENTREPOT
+                      ENTREPÔT :
                     </label>
                     <input
                       name="entrepot"
@@ -3991,7 +3923,7 @@ export function Entrepot() {
                       htmlFor="CASIER"
                       className="font-semibold text-gray-700 text-sm block"
                     >
-                      CASIER
+                      CASIER :
                     </label>
                     <input
                       name="casier"
@@ -4006,7 +3938,7 @@ export function Entrepot() {
                       htmlFor="produit"
                       className="font-semibold text-gray-700 text-sm block"
                     >
-                      PRODUITS
+                      PRODUITS :
                     </label>
                     <input
                       name="produit"
@@ -4022,7 +3954,7 @@ export function Entrepot() {
                       htmlFor="utilisateur"
                       className="font-semibold text-gray-700 text-sm block"
                     >
-                      UTILISATEUR
+                      UTILISATEUR :
                     </label>
 
                     <input
@@ -4039,7 +3971,7 @@ export function Entrepot() {
                       htmlFor="utilisateur"
                       className="font-semibold text-gray-700 text-sm block"
                     >
-                      ACTION
+                      ACTION :
                     </label>
                     <input
                       name="action"
@@ -4113,9 +4045,13 @@ export function Entrepot() {
                   onSubmit={handleSearcheSubmitansfertHistorique}
                 >
                   {[
-                    { label: "ENTREPOT", name: "entrepot", type: "text" },
-                    { label: "UTILISATEUR", name: "utilisateur", type: "text" },
-                    { label: "PRODUIT", name: "produit", type: "text" },
+                    { label: "ENTREPÔT :", name: "entrepot", type: "text" },
+                    {
+                      label: "UTILISATEUR :",
+                      name: "utilisateur",
+                      type: "text",
+                    },
+                    { label: "PRODUIT :", name: "produit", type: "text" },
                   ].map(({ label, name, type }) => (
                     <div key={name}>
                       <label className="font-semibold text-gray-700">
@@ -4133,7 +4069,9 @@ export function Entrepot() {
 
                   {/* ETAT */}
                   <div>
-                    <label className="font-semibold text-gray-700">ETAT</label>
+                    <label className="font-semibold text-gray-700">
+                      ÉTAT :
+                    </label>
                     <select
                       name="etat"
                       value={formDataSearcheMouvement.etat}
@@ -4280,7 +4218,7 @@ export function Entrepot() {
                       htmlFor="zone"
                       className="font-semibold text-gray-700"
                     >
-                      CATEGORIE
+                      CATÉGORIE
                     </label>
 
                     <select
@@ -4305,7 +4243,7 @@ export function Entrepot() {
                       htmlFor="entrepot"
                       className="font-semibold text-gray-700"
                     >
-                      ENTROPOT
+                      ENTREPÔT
                     </label>
                     <select
                       id="entrepot"
@@ -4475,7 +4413,7 @@ export function Entrepot() {
                       name="ETAT"
                       className="w-24 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
                     >
-                      <option value="">ETAT</option>
+                      <option value="">ÉTAT</option>
                     </select>
 
                     <input
@@ -4511,7 +4449,7 @@ export function Entrepot() {
                           ACTION
                         </th>
                         <th className="px-4 py-2 border border-gray-300 text-left">
-                          ETAT
+                          ÉTAT
                         </th>
                         <th className="px-4 py-2 border border-gray-300 text-right">
                           DATE
@@ -4590,6 +4528,50 @@ export function Entrepot() {
                       </tr>
                     </tbody>
                   </table>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {ActivationAffichage === "ListeEntrepot" && (
+            <div>
+              <h1 className="text-2xl font-bold text-blue-500 mt-6 mb-4 underline">
+                Statistiques
+              </h1>
+
+              <div className=" grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="col-span-1 md:col-span-3 overflow-x-auto">
+                  <BarChart
+                    xAxis={[
+                      { data: ["Categorie A", "Categorie B", "Categorie C"] },
+                    ]}
+                    series={[
+                      { data: [4, 6, 3] },
+                      { data: [2, 4, 5] },
+                      { data: [4, 3, 7] },
+                    ]}
+                    height={300}
+                  />
+                </div>
+                <div className="flex flex-col justify-center space-y-3 ml-0 md:ml-6">
+                  <div>
+                    <span className="bg-blue-800 text-blue-800 rounded px-2">
+                      G
+                    </span>
+                    <strong className="ml-2">Série 1</strong>
+                  </div>
+                  <div>
+                    <span className="bg-red-500 text-red-500 rounded px-2">
+                      G
+                    </span>
+                    <strong className="ml-2">Série 2</strong>
+                  </div>
+                  <div>
+                    <span className="bg-yellow-400 text-yellow-400 rounded px-2">
+                      G
+                    </span>
+                    <strong className="ml-2">Série 3</strong>
+                  </div>
                 </div>
               </div>
             </div>

@@ -27,15 +27,22 @@ export function NavbarFournisseur({ value }) {
 
   return (
     <nav className="bg-blue-500  border-b border-gray-200 p-2">
-      <div className="max-w-7xl  mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex text-white justify-between items-center h-16">
+      <div className="">
+        {/* max-w-7xl  mx-auto px-4 sm:px-6 lg:px-8 */}
+        <div className="flex text-white justify-between items-center h-16 ">
           {/* Logo */}
-          <div className="flex-shrink-0 flex items-center">
-            <span className="text-xl font-bold text-red-600">Logo</span>
+          <div
+            style={{
+              textAlign: "center",
+              width: "19%",
+            }}
+          >
+            {/* flex-shrink-0 flex items-center */}
+            <span className="text-xl font-bold text-red-600">LOGO</span>
           </div>
 
           {/* Menu Desktop */}
-          <div className="hidden sm:flex sm:space-x-4">
+          <div className="hidden sm:flex">
             {links.map((link) => (
               <NavLink
                 key={link.href}
@@ -46,56 +53,57 @@ export function NavbarFournisseur({ value }) {
                 {link.label}
               </NavLink>
             ))}
+            <NavLink
+              to="/Categorie"
+              className={`px-3 py-2 rounded-md text-sm font-medium ${
+                value === "Categorie"
+                  ? "underline text-yellow-500 px-3 py-2 rounded-md text-sm font-medium  "
+                  : "text-white hover:underline"
+              }`}
+            >
+              Categorie
+            </NavLink>
+
+            <NavLink
+              to="/tiers"
+              className={`px-3 py-2 rounded-md text-sm font-medium ${
+                value === "tiers"
+                  ? "underline text-yellow-500 px-3 py-2 rounded-md text-sm font-medium  "
+                  : "text-white hover:underline"
+              }`}
+            >
+              TIERS
+            </NavLink>
+            <NavLink
+              to="/Article_Service"
+              className={`px-3 py-2 rounded-md text-sm font-medium ${
+                value === "Article"
+                  ? "underline text-yellow-500 px-3 py-2 rounded-md text-sm font-medium "
+                  : "text-white hover:underline"
+              }`}
+            >
+              STOCK
+            </NavLink>
           </div>
-
-          <NavLink
-            to="/Categorie"
-            className={`px-3 py-2 rounded-md text-sm font-medium ${
-              value === "Categorie"
-                ? "underline text-yellow-500 px-3 py-2 rounded-md text-sm font-medium  "
-                : "text-white hover:underline"
-            }`}
-          >
-            Categorie
-          </NavLink>
-
-          <NavLink
-            to="/tiers"
-            className={`px-3 py-2 rounded-md text-sm font-medium ${
-              value === "tiers"
-                ? "underline text-yellow-500 px-3 py-2 rounded-md text-sm font-medium  "
-                : "text-white hover:underline"
-            }`}
-          >
-            TIERS
-          </NavLink>
-          <NavLink
-            to="/Article_Service"
-            className={`px-3 py-2 rounded-md text-sm font-medium ${
-              value === "Article"
-                ? "underline text-yellow-500 px-3 py-2 rounded-md text-sm font-medium "
-                : "text-white hover:underline"
-            }`}
-          >
-            STOCK
-          </NavLink>
 
           {/* Utilisateur Desktop */}
           <div className="hidden sm:flex items-center space-x-4">
-            <NavLink className="px-3 py-2 text-gray-700 hover:text-red-600">
-              <button
-                onClick={() => {
-                  if (
-                    window.confirm("Voulez-vous vraiment vous déconnecter ?")
-                  ) {
-                    handleLogout(); // si l'utilisateur clique sur "OK"
-                  }
-                }}
-                className="px-3 py-1  ml-[7%] bg-red-500 text-white rounded"
-              >
-                Déconnexion
-              </button>
-            </NavLink>
+            {
+              <NavLink className="px-3 py-2 text-gray-700 hover:text-red-600">
+                <button
+                  onClick={() => {
+                    if (
+                      window.confirm("Voulez-vous vraiment vous déconnecter ?")
+                    ) {
+                      handleLogout(); // si l'utilisateur clique sur "OK"
+                    }
+                  }}
+                  className="px-3 py-1  ml-[7%] bg-red-500 text-white rounded"
+                >
+                  Déconnexion
+                </button>
+              </NavLink>
+            }
             <NavLink
               to="/parametre"
               className="px-3 py-2 text-gray-700 hover:text-red-600"
@@ -111,7 +119,7 @@ export function NavbarFournisseur({ value }) {
               />
             </NavLink>
           </div>
-
+          {/* <div class></div> */}
           {/* Menu Mobile Toggle */}
           <div className="flex items-center sm:hidden">
             <button
@@ -142,7 +150,7 @@ export function NavbarFournisseur({ value }) {
                 {link.label}
               </NavLink>
             ))}
-            <div className=" w-[25%] gap-6 flex justify-end  items-center">
+            {/* <div className=" w-[25%] gap-6 flex justify-end  items-center">
               <button
                 onClick={handleLogout}
                 className="px-3 py-1  ml-[7%] bg-red-500 text-white rounded"
@@ -155,7 +163,7 @@ export function NavbarFournisseur({ value }) {
                 onClick={() => navigate("/AcceuilConso")}
                 className="mr-[8%] p-1"
               ></a>
-            </div>
+            </div> */}
           </div>
         </div>
       )}

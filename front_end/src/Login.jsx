@@ -46,8 +46,23 @@ export default function Login() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-white p-4">
-      <div className="p-8 rounded-2xl shadow-2xl w-full max-w-sm bg-[#3b82f6]">
+    <div className="relative flex items-center justify-center min-h-screen bg-white p-4 overflow-hidden">
+      {/* Background flouté */}
+      <div
+        className="absolute inset-0 bg-cover bg-center"
+        style={{
+          backgroundImage:
+            "url('/image/woman-shopping-legumes-au-supermarche.jpg')",
+          filter: "blur(2px)", // 👈 blur seulement ici
+          zIndex: 0,
+        }}
+      ></div>
+
+      {/* Overlay sombre pour un meilleur contraste */}
+      <div className="absolute inset-0 bg-black/30 z-10"></div>
+
+      {/* Card net */}
+      <div className="relative p-8 rounded-2xl shadow-2xl w-full max-w-sm bg-[#3b82f6] z-20">
         <form onSubmit={handleSubmit}>
           <div className="flex flex-col mt-4">
             <label className="mb-1 text-xl font-medium text-yellow-500">
