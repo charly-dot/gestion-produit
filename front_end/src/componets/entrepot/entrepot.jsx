@@ -505,7 +505,9 @@ export function Entrepot() {
       setProduits(res.data.data);
 
       showMessage("success", res.data.message);
-      // console.log(res.data.data);
+      console.log("sfqddddddddddd");
+      console.log(res.data.data);
+      console.log("sfqddddddddddd");
     } catch (err) {
       const res = err.response;
       if (res) {
@@ -521,8 +523,9 @@ export function Entrepot() {
 
         // Tous les produits pour le select
         setProduits(res.data.data);
-
+        console.log("sfqddddddddddd");
         console.log(res.data.data);
+        console.log("sfqddddddddddd");
         showMessage("error", res.data.message || "Erreur serveur");
       } else {
         showMessage("error", "Erreur réseau");
@@ -623,35 +626,6 @@ export function Entrepot() {
     }
   };
 
-  // const etat_entrepot = async (id, currentEtat) => {
-  //   const newStatus = currentEtat === "activer" ? "desactiver" : "activer";
-
-  //   try {
-  //     const response = await axios.post(
-  //       `http://127.0.0.1:8000/api/changer_activation_entrepot/${id}`,
-  //       { activation: newStatus }
-  //     );
-
-  //     setdonneEntrepotCreer({
-  //       ...donneEntrepotCreer, // garder l’ancien id
-  //       ...response.data.data,
-  //       totalGeneral: response.data.totalGeneral,
-  //     });
-
-  //     setEntrepot({
-  //       ...res.data.data[0],
-  //       totalGeneral: res.data.totalGeneral,
-  //     });
-
-  //     setProduits(res.data.data);
-
-  //     showMessage("success", response.data.message);
-  //     // console.log("TOTAL GENERAL :", response.data.totalGeneral);
-  //   } catch (err) {
-  //     console.error(err);
-  //     setError("Erreur lors de la modification de l'activation ❌");
-  //   }
-  // };
   const suppression_entrepots = async (id) => {
     if (!window.confirm("⚠️ Voulez-vous vraiment supprimer ce entrepot ?")) {
       return;
@@ -703,10 +677,14 @@ export function Entrepot() {
     setLoading(true);
     try {
       const response = await axios.get(
-        `http://127.0.0.1:8000/api/MouvementStockEntrepot/${donneEntrepotCreer.id}`
+        `http://127.0.0.1:8000/api/MouvementStockEntrepot/${donneEntrepotCreer.idCasier}`
       );
-      setOrigineListeMouvementStockENTREPOT(response.data);
-      setListeMouvementStockENTREPOT(response.data);
+      // console.log("donne entrepot:", donneEntrepotCreer.idCasier);
+      setOrigineListeMouvementStockENTREPOT(response.data.donne);
+      setListeMouvementStockENTREPOT(response.data.donne);
+      // console.log("DDDDDDDDDDDDDDDDDDD");
+      // console.log("ID Entrepot:", response.data.id);
+      // console.log("Mouvements:", response.data.donne);
     } catch (err) {
       console.error("Erreur lors du chargement des mouvements :", err);
     } finally {
@@ -811,10 +789,14 @@ export function Entrepot() {
     setLoading(true);
     try {
       const response = await axios.get(
-        `http://127.0.0.1:8000/api/HistoriqueEntrepot/${donneEntrepotCreer.id}`
+        `http://127.0.0.1:8000/api/HistoriqueEntrepot/${donneEntrepotCreer.idCasier}`
       );
       setOrigineListeHistoriqueStockENTREPOT(response.data);
       setListeHistoriqueStockENTREPOT(response.data);
+
+      // console.log("DDDDDDDDDDDDDDDDDDD");
+      // console.log("ID Entrepot:", response.data.id);
+      // console.log("Mouvements:", response.data.donne);
     } catch (err) {
     } finally {
       setLoading(false);
@@ -1322,7 +1304,7 @@ export function Entrepot() {
     { field: "created_at", headerName: "DATE", width: 140 },
     { field: "entrepot_nom", headerName: "ENTREPÔT", width: 140 },
     { field: "nom", headerName: "CASIER", width: 140 },
-    { field: "nomproduit", headerName: "PRODUIT", width: 140 }, // ton JSON ne l’a pas encore
+    { field: "nomproduit", headerName: "PRODUIT", width: 140 },
     { field: "stock_total", headerName: "STOCK", width: 140 },
     { field: "action", headerName: "ACTION", width: 160 },
     { field: "user_name", headerName: "UTILISATEUR", width: 154 },
@@ -1740,6 +1722,7 @@ export function Entrepot() {
                       : ""
                   }`}
                   onClick={() => {
+                    listemsE();
                     handleSelectType("entrepotcree");
                     handleSelect(
                       "MOUVEMENT DE STOCK entrepot",

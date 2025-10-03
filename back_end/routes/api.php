@@ -724,7 +724,6 @@ Route::get('/HistoriqueEntrepot/{id}', function ($id) {
 });
 
 Route::get('/MouvementStockEntrepot/{id}', function ($id) {
-
     // $id = 1;
     // $Mouvementstock = "slfj";
     $Mouvementstock = DB::table('mouvementstocks')
@@ -744,7 +743,15 @@ Route::get('/MouvementStockEntrepot/{id}', function ($id) {
         )
         ->get();
 
-    return response()->json($Mouvementstock);
+    // return response()->json([
+    //     'id' => $id,
+    //     'donne' => $Mouvementstock
+    // ], 201)
+
+    return response()->json([
+        'id' => $id,
+        'donne' => $Mouvementstock,
+    ], 200);
 });
 
 Route::post('/creationEntrepot/{id}', function (Request $request, $id) {
@@ -1072,7 +1079,7 @@ Route::get('/HistoriqueTransfert/{id}', function ($id) {
     return response()->json($Mouvementstock);
 });
 Route::get('/MouvementStock/{id}', function ($id) {
-    $id = 1;
+    // $id = é;
     $Mouvementstock = DB::table('mouvementstocks')
         ->join('users', 'mouvementstocks.colone5', '=', 'users.id')
         ->join('entrepots', 'mouvementstocks.entrepot', '=', 'entrepots.id')
