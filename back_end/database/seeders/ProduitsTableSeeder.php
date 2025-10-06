@@ -18,7 +18,7 @@ class ProduitsTableSeeder extends Seeder
             'stock_initia' => 50,
             'zone' => 'Antananarivo',
             'fichier' => 'demo.jpg',
-            'idStockage' => rand(1, 5),
+            'idStockage' => rand(1, 2),
             'type_categorie' => 'Alimentaire',
             'categorie' => 'Snack',
             'code_compta' => '001-002',

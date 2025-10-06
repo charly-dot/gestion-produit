@@ -18,7 +18,7 @@ class ProduitFactory extends Factory
             'zone' => $this->faker->city,
             'etat' => "activer",
             'fichier' => $this->faker->word . '.jpg',
-            'idStockage' => $this->faker->numberBetween(1, 5),
+            'idStockage' => $this->faker->numberBetween(1, 2),
             'type_categorie' => $this->faker->randomElement(['Alimentaire', 'Electronique', 'Textile']),
             'categorie' => $this->faker->word,
             'code_compta' => $this->faker->numerify('###-###'),
